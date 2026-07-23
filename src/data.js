@@ -495,12 +495,60 @@ export const faqs = [
   },
 ]
 
+// ===== صفحه درباره ما =====
+export const aboutInfo = [
+  { label: 'تاسیس', value: '۱۳۹۴', icon: 'calendar' },
+  { label: 'موقعیت', value: 'تهران، ایران', icon: 'pin' },
+  { label: 'حوزه فعالیت', value: 'فروش و نصب چمن مصنوعی', icon: 'grid' },
+  { label: 'ماموریت ما', value: 'ارائه بهترین کیفیت با قیمت مناسب و خدمات حرفه‌ای', icon: 'target' },
+]
+
+export const aboutStats = [
+  { icon: 'pin', value: 'سراسر کشور', label: 'پروژه‌های اجرا شده' },
+  { icon: 'smile', value: '+۲۰۰۰ مشتری', label: 'رضایتمند' },
+  { icon: 'briefcase', value: '+۵۰۰ پروژه', label: 'اجرای موفق' },
+  { icon: 'users', value: '+۸ سال', label: 'تجربه درخشان' },
+]
+
+export const aboutValues = [
+  {
+    title: 'کیفیت برتر',
+    desc: 'استفاده از بهترین متریال و برندهای معتبر برای تضمین کیفیت و دوام محصولات.',
+    icon: 'shield',
+  },
+  {
+    title: 'تیم متخصص',
+    desc: 'تیم حرفه‌ای و مجرب در تمام مراحل، از مشاوره تا اجرا، همراه شماست.',
+    icon: 'users',
+  },
+  {
+    title: 'اجرای استاندارد',
+    desc: 'اجرای دقیق و اصولی با رعایت استانداردهای روز و جزئیات فنی پروژه.',
+    icon: 'medal',
+  },
+  {
+    title: 'خدمات پس از فروش',
+    desc: 'پشتیبانی و خدمات پس از فروش حرفه‌ای برای اطمینان خاطر شما.',
+    icon: 'headset',
+  },
+  {
+    title: 'قیمت منصفانه',
+    desc: 'ارائه بهترین کیفیت با مناسب‌ترین قیمت و شفافیت کامل در قیمت‌گذاری.',
+    icon: 'tag',
+  },
+]
+
+export const workingHours = [
+  { day: 'شنبه تا چهارشنبه', time: '۹:۰۰ تا ۱۸:۰۰' },
+  { day: 'پنجشنبه', time: '۹:۰۰ تا ۱۳:۰۰' },
+]
+
 // لینک‌های منو
 export const navLinks = [
   { label: 'صفحه اصلی', type: 'route', to: '/', match: '/' },
   { label: 'محصولات', type: 'route', to: '/products', match: '/products', dropdown: true },
   { label: 'پروژه‌ها', type: 'route', to: '/projects', match: '/projects' },
   { label: 'خدمات', type: 'route', to: '/services', match: '/services' },
-  { label: 'درباره ما', type: 'hash', id: 'about' },
+  { label: 'درباره ما', type: 'route', to: '/about', match: '/about' },
   { label: 'تماس با ما', type: 'hash', id: 'contact' },
 ]

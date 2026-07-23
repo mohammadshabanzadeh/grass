@@ -79,6 +79,19 @@
   }
 }
 
+/* لبه‌ی منحنیِ تصویر هیرو صفحه درباره ما (فقط دسکتاپ) */
+@media (min-width: 1024px) {
+  .about-hero-clip {
+    clip-path: ellipse(88% 128% at 12% 50%);
+  }
+}
+
+/* امضای دست‌نویسِ تیم */
+.signature {
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
 /* ===== اسلایدر دو سره ارتفاع ===== */
 .dual-range {
   position: relative;

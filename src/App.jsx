@@ -5,6 +5,7 @@ import Home from './pages/Home.jsx'
 import ProductsPage from './pages/ProductsPage.jsx'
 import ProjectsPage from './pages/ProjectsPage.jsx'
 import ServicesPage from './pages/ServicesPage.jsx'
+import AboutPage from './pages/AboutPage.jsx'
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/services" element={<ServicesPage />} />
+            <Route path="/about" element={<AboutPage />} />
           </Routes>
         </main>
         <Footer />

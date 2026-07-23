@@ -1,12 +1,14 @@
-import { MapPin, Phone, Mail, Instagram, Send, Heart } from 'lucide-react'
+import { MapPin, Phone, Mail, Instagram, Send, Heart, Clock } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import Logo from './Logo.jsx'
+import { workingHours } from '../data.js'
 
 const quickLinks = [
   { label: 'صفحه اصلی', type: 'route', to: '/' },
   { label: 'محصولات', type: 'route', to: '/products' },
   { label: 'پروژه‌ها', type: 'route', to: '/projects' },
-  { label: 'درباره ما', type: 'hash', id: 'about' },
+  { label: 'خدمات', type: 'route', to: '/services' },
+  { label: 'درباره ما', type: 'route', to: '/about' },
   { label: 'تماس با ما', type: 'hash', id: 'contact' },
 ]
 
@@ -39,12 +41,30 @@ export default function Footer() {
   }
 
   return (
-    <footer id="about" className="relative mt-8 bg-slate-900 pt-16 text-slate-300">
+    <footer className="relative mt-8 bg-slate-900 pt-16 text-slate-300">
       <div className="container-x">
-        <div className="grid grid-cols-2 gap-10 pb-12 lg:grid-cols-4">
-          {/* دسترسی سریع */}
+        <div className="grid grid-cols-2 gap-10 pb-12 lg:grid-cols-5">
+          {/* ساعات کاری */}
           <div>
-            <h4 className="mb-5 text-base font-bold text-white">دسترسی سریع</h4>
+            <h4 className="mb-5 text-base font-bold text-white">ساعات کاری</h4>
+            <ul className="space-y-4 text-sm">
+              {workingHours.map((w) => (
+                <li key={w.day}>
+                  <p className="flex items-center gap-1.5 font-semibold text-slate-300">
+                    <Clock size={15} className="text-brand-400" />
+                    {w.day}
+                  </p>
+                  <p className="mt-1 pr-5 text-slate-400" dir="ltr">
+                    {w.time}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* لینک‌های مفید */}
+          <div>
+            <h4 className="mb-5 text-base font-bold text-white">لینک‌های مفید</h4>
             <ul className="space-y-3 text-sm">
               {quickLinks.map((l) => (
                 <li key={l.label}>
