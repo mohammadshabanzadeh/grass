@@ -543,6 +543,19 @@ export const workingHours = [
   { day: 'پنجشنبه', time: '۹:۰۰ تا ۱۳:۰۰' },
 ]
 
+// ===== صفحه تماس با ما =====
+export const contactAddress = 'تهران، شهرک صنعتی شهاب، صنعت ۱۳، پلاک ۴۵'
+export const contactPostal = '۱۴۵۸۴۶۵۳۴۷۱'
+export const contactMapSrc =
+  'https://maps.google.com/maps?q=Tehran%2C%20Iran&z=12&output=embed'
+
+export const contactCards = [
+  { icon: 'phone', label: 'تلفن تماس', value: '۰۲۱ ۴۵۶۷ ۸۹۰۱', href: 'tel:02145678901' },
+  { icon: 'whatsapp', label: 'واتساپ', value: '۰۹۱۲ ۱۲۳ ۴۵۶۷', href: 'https://wa.me/989121234567' },
+  { icon: 'mail', label: 'ایمیل', value: 'info@farazchaman.ir', href: 'mailto:info@farazchaman.ir' },
+  { icon: 'clock', label: 'ساعات کاری', value: 'شنبه تا پنجشنبه', sub: '۹:۰۰ الی ۱۸:۰۰' },
+]
+
 // لینک‌های منو
 export const navLinks = [
   { label: 'صفحه اصلی', type: 'route', to: '/', match: '/' },
@@ -550,5 +563,5 @@ export const navLinks = [
   { label: 'پروژه‌ها', type: 'route', to: '/projects', match: '/projects' },
   { label: 'خدمات', type: 'route', to: '/services', match: '/services' },
   { label: 'درباره ما', type: 'route', to: '/about', match: '/about' },
-  { label: 'تماس با ما', type: 'hash', id: 'contact' },
+  { label: 'تماس با ما', type: 'route', to: '/contact', match: '/contact' },
 ]

@@ -7,6 +7,7 @@ export default function CTA({
   line2 = 'با ما در تماس باشید.',
   subtitle,
   buttonText = 'تماس با ما',
+  icon: Icon,
 }) {
   return (
     <section id="contact" className="container-x py-8">
@@ -26,19 +27,26 @@ export default function CTA({
         <div className="absolute inset-0 bg-gradient-to-l from-brand-700/85 to-brand-600/85" />
 
         <div className="relative flex flex-col items-center justify-between gap-6 sm:flex-row-reverse">
-          <div className="text-center text-white sm:text-right">
-            <h3 className="text-2xl font-extrabold leading-relaxed sm:text-3xl">
-              {line1}
-              {!subtitle && (
-                <>
-                  <br />
-                  {line2}
-                </>
-              )}
-            </h3>
-            {subtitle && (
-              <p className="mt-2.5 text-sm leading-8 text-white/85 sm:text-base">{subtitle}</p>
+          <div className="flex flex-col items-center gap-4 text-center text-white sm:flex-row sm:text-right">
+            {Icon && (
+              <span className="glass-dark flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-white">
+                <Icon size={30} />
+              </span>
             )}
+            <div>
+              <h3 className="text-2xl font-extrabold leading-relaxed sm:text-3xl">
+                {line1}
+                {!subtitle && (
+                  <>
+                    <br />
+                    {line2}
+                  </>
+                )}
+              </h3>
+              {subtitle && (
+                <p className="mt-2.5 text-sm leading-8 text-white/85 sm:text-base">{subtitle}</p>
+              )}
+            </div>
           </div>
           <a
             href="tel:09121234567"

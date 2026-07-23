@@ -9,7 +9,7 @@ const quickLinks = [
   { label: 'پروژه‌ها', type: 'route', to: '/projects' },
   { label: 'خدمات', type: 'route', to: '/services' },
   { label: 'درباره ما', type: 'route', to: '/about' },
-  { label: 'تماس با ما', type: 'hash', id: 'contact' },
+  { label: 'تماس با ما', type: 'route', to: '/contact' },
 ]
 
 const services = ['فروش چمن مصنوعی', 'نصب چمن مصنوعی', 'زیرسازی و آماده‌سازی', 'مشاوره و طراحی']
