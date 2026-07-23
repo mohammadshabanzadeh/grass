@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply text-slate-800 font-sans antialiased;
+    -webkit-font-smoothing: antialiased;
+    background-color: #eef3fb;
+    background-image:
+      radial-gradient(45rem 45rem at 85% -5%, rgba(62, 166, 62, 0.16), transparent 60%),
+      radial-gradient(40rem 40rem at 5% 15%, rgba(37, 99, 235, 0.14), transparent 60%),
+      radial-gradient(38rem 38rem at 95% 70%, rgba(37, 99, 235, 0.12), transparent 60%),
+      radial-gradient(42rem 42rem at 10% 95%, rgba(62, 166, 62, 0.14), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  /* Persian digits helper */
+  .num-fa {
+    font-feature-settings: 'ss01';
+  }
+}
+
+@layer utilities {
+  .container-x {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-l from-brand-300 to-white bg-clip-text text-transparent;
+  }
+
+  /* ===== شیشه‌ای (Glassmorphism) ===== */
+  /* شیشه روشن روی پس‌زمینه‌ی روشن/رنگی */
+  .glass {
+    background: rgba(255, 255, 255, 0.45);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 12px 40px -12px rgba(15, 23, 42, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  /* شیشه‌ی پررنگ‌تر و مات‌تر */
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.6);
+    -webkit-backdrop-filter: blur(22px) saturate(170%);
+    backdrop-filter: blur(22px) saturate(170%);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow: 0 18px 50px -18px rgba(15, 23, 42, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  /* شیشه‌ی تیره برای روی تصویر/رنگ تیره */
+  .glass-dark {
+    background: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  /* کارت آبی شیشه‌ای هیرو */
+  .glass-brand {
+    background: linear-gradient(
+      135deg,
+      rgba(29, 78, 216, 0.58) 0%,
+      rgba(37, 99, 235, 0.42) 100%
+    );
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 25px 60px -20px rgba(30, 58, 138, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  }
+}
+
+/* ===== اسلایدر دو سره ارتفاع ===== */
+.dual-range {
+  position: relative;
+  height: 6px;
+}
+.dual-range input[type='range'] {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  margin: 0;
+  transform: translateY(-50%);
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+}
+.dual-range input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  height: 18px;
+  width: 18px;
+  border-radius: 9999px;
+  background: #2563eb;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.45);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.dual-range input[type='range']::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+.dual-range input[type='range']::-moz-range-thumb {
+  pointer-events: auto;
+  height: 18px;
+  width: 18px;
+  border-radius: 9999px;
+  background: #2563eb;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.45);
+  cursor: pointer;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #eef2f7;
+}
+::-webkit-scrollbar-thumb {
+  background: #b9c6d8;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
