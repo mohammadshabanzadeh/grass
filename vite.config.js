@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// در بیلد (GitHub Pages) مسیر base نام مخزن است، در حالت توسعه ریشه.
+// base نسبی تا هم روی Vercel (ریشه) و هم GitHub Pages (زیرمسیر) کار کند.
 export default defineConfig(({ command }) => ({
-  base: command === 'build' ? '/grass/' : '/',
+  base: command === 'build' ? './' : '/',
   plugins: [react()],
   server: {
     port: 5173,
