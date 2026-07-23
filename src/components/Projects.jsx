@@ -1,10 +1,12 @@
 import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import SmartImage from './SmartImage.jsx'
 import SectionHeading from './SectionHeading.jsx'
 import { projects } from '../data.js'
 
 export default function Projects() {
+  const navigate = useNavigate()
   return (
     <section id="projects" className="relative overflow-hidden py-20 sm:py-24">
       <div className="pointer-events-none absolute left-[-5rem] top-16 h-72 w-72 rounded-full bg-brand-400/20 blur-3xl" />
@@ -41,8 +43,11 @@ export default function Projects() {
         </div>
 
         <div className="mt-12 flex justify-center">
-          <motion.a
-            href="#contact"
+          <motion.button
+            onClick={() => {
+              navigate('/projects')
+              window.scrollTo({ top: 0 })
+            }}
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -51,7 +56,7 @@ export default function Projects() {
           >
             مشاهده تمامی پروژه‌ها
             <ArrowLeft size={18} className="transition group-hover:-translate-x-1" />
-          </motion.a>
+          </motion.button>
         </div>
       </div>
     </section>

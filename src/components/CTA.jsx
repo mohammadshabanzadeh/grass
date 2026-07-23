@@ -2,7 +2,10 @@ import { motion } from 'framer-motion'
 import { Phone } from 'lucide-react'
 import SmartImage from './SmartImage.jsx'
 
-export default function CTA() {
+export default function CTA({
+  line1 = 'برای مشاوره رایگان و دریافت قیمت',
+  line2 = 'با ما در تماس باشید.',
+}) {
   return (
     <section id="contact" className="container-x py-8">
       <motion.div
@@ -23,9 +26,9 @@ export default function CTA() {
         <div className="relative flex flex-col items-center justify-between gap-6 sm:flex-row-reverse">
           <div className="text-center text-white sm:text-right">
             <h3 className="text-2xl font-extrabold leading-relaxed sm:text-3xl">
-              برای مشاوره رایگان و دریافت قیمت
+              {line1}
               <br />
-              با ما در تماس باشید.
+              {line2}
             </h3>
           </div>
           <a

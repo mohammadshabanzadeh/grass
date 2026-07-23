@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, forwardRef } from 'react'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft,
@@ -25,19 +25,17 @@ const iconMap = {
   rooftop: Layers,
 }
 
-export default function ProductCard({
-  p,
-  index = 0,
-  linkText = 'مشاهده محصول',
-  showFav = false,
-  view = 'grid',
-}) {
+const ProductCard = forwardRef(function ProductCard(
+  { p, index = 0, linkText = 'مشاهده محصول', showFav = false, view = 'grid' },
+  ref,
+) {
   const Icon = iconMap[p.icon] || Sparkles
   const [fav, setFav] = useState(false)
 
   if (view === 'list') {
     return (
       <motion.article
+        ref={ref}
         layout
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -76,6 +74,7 @@ export default function ProductCard({
 
   return (
     <motion.article
+      ref={ref}
       layout
       initial={{ opacity: 0, y: 40, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -121,4 +120,6 @@ export default function ProductCard({
       </div>
     </motion.article>
   )
-}
+})
+
+export default ProductCard

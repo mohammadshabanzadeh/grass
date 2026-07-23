@@ -51,15 +51,14 @@ export default function Navbar() {
           scrolled ? 'glass-strong' : 'glass'
         }`}
       >
-        {/* دکمه مشاوره (راست در RTL) */}
-        <a
-          href="#contact"
-          onClick={(e) => handleNav(e, { type: 'hash', id: 'contact' })}
-          className="hidden items-center gap-2 rounded-xl border border-white/30 bg-grass-500/90 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-grass-500/30 backdrop-blur transition hover:-translate-y-0.5 hover:bg-grass-600 lg:flex"
+        {/* لوگو (راست در RTL) */}
+        <Link
+          to="/"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="flex items-center"
         >
-          <Phone size={17} />
-          مشاوره رایگان
-        </a>
+          <Logo />
+        </Link>
 
         {/* منوی دسکتاپ */}
         <ul className="hidden items-center gap-7 xl:gap-8 lg:flex">
@@ -86,14 +85,15 @@ export default function Navbar() {
           ))}
         </ul>
 
-        {/* لوگو (چپ در RTL) */}
-        <Link
-          to="/"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="flex items-center"
+        {/* دکمه مشاوره (چپ در RTL) */}
+        <a
+          href="#contact"
+          onClick={(e) => handleNav(e, { type: 'hash', id: 'contact' })}
+          className="hidden items-center gap-2 rounded-xl border border-white/30 bg-grass-500/90 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-grass-500/30 backdrop-blur transition hover:-translate-y-0.5 hover:bg-grass-600 lg:flex"
         >
-          <Logo />
-        </Link>
+          <Phone size={17} />
+          مشاوره رایگان
+        </a>
 
         {/* همبرگر موبایل */}
         <button

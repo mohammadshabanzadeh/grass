@@ -223,11 +223,158 @@ export const projects = [
   },
 ]
 
+// ===== صفحه پروژه‌ها =====
+export const projectStats = [
+  { value: '+۱۲۰', label: 'پروژه اجرا شده', icon: 'check' },
+  { value: '+۸۰,۰۰۰', label: 'متر مربع اجرا', icon: 'area' },
+  { value: '+۸', label: 'سال تجربه', icon: 'award' },
+]
+
+export const projectCategories = [
+  { key: 'all', label: 'همه دسته بندی ها' },
+  { key: 'sport', label: 'زمین ورزشی' },
+  { key: 'roof', label: 'روف گاردن' },
+  { key: 'kids', label: 'فضای بازی کودکان' },
+  { key: 'villa', label: 'محوطه سازی ویلا' },
+  { key: 'terrace', label: 'تراس و بالکن' },
+  { key: 'office', label: 'فضای اداری و تجاری' },
+  { key: 'park', label: 'پارک و فضای عمومی' },
+]
+
+export const usageTypes = [
+  { key: 'all', label: 'همه کاربری ها' },
+  { key: 'residential', label: 'مسکونی' },
+  { key: 'commercial', label: 'تجاری' },
+  { key: 'office', label: 'اداری' },
+  { key: 'public', label: 'عمومی' },
+  { key: 'sport', label: 'ورزشی' },
+]
+
+export const cities = ['همه شهرها', 'تهران', 'کرج و البرز', 'مشهد', 'شیراز']
+
+export const projectSortOptions = [
+  'جدیدترین پروژه ها',
+  'قدیمی‌ترین',
+  'بزرگ‌ترین متراژ',
+  'کوچک‌ترین متراژ',
+]
+
+export const allProjects = [
+  {
+    id: 'p1',
+    title: 'زمین فوتبال ۵۰۰ نفری',
+    city: 'تهران، شهرک صنعتی شهاب',
+    cityKey: 'تهران',
+    category: 'sport',
+    usage: 'sport',
+    badge: 'زمین ورزشی',
+    area: 5000,
+    img: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?auto=format&fit=crop&w=800&q=70',
+    gradient: 'linear-gradient(135deg,#16a34a 0%,#15803d 55%,#052e16 120%)',
+  },
+  {
+    id: 'p2',
+    title: 'روف گاردن مجتمع ستاره',
+    city: 'تهران، نیاوران',
+    cityKey: 'تهران',
+    category: 'roof',
+    usage: 'residential',
+    badge: 'روف گاردن',
+    area: 800,
+    img: 'https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=800&q=70',
+    gradient: 'linear-gradient(135deg,#4ade80 0%,#16a34a 55%,#14532d 120%)',
+  },
+  {
+    id: 'p3',
+    title: 'محوطه سازی ویلا در کردان',
+    city: 'البرز، کردان',
+    cityKey: 'کرج و البرز',
+    category: 'villa',
+    usage: 'residential',
+    badge: 'محوطه ویلا',
+    area: 1200,
+    img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=70',
+    gradient: 'linear-gradient(135deg,#64748b,#1e293b 70%,#22c55e)',
+  },
+  {
+    id: 'p4',
+    title: 'فضای بازی کودکان',
+    city: 'مشهد، شهرک غرب',
+    cityKey: 'مشهد',
+    category: 'kids',
+    usage: 'public',
+    badge: 'فضای بازی کودکان',
+    area: 600,
+    img: 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=800&q=70',
+    gradient: 'linear-gradient(135deg,#f97316 0%,#22c55e 60%,#15803d 120%)',
+  },
+  {
+    id: 'p5',
+    title: 'تراس سبز برج آسمان',
+    city: 'تهران، سعادت آباد',
+    cityKey: 'تهران',
+    category: 'terrace',
+    usage: 'residential',
+    badge: 'تراس و بالکن',
+    area: 400,
+    img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=70',
+    gradient: 'linear-gradient(135deg,#334155,#0f172a 70%,#16a34a)',
+  },
+  {
+    id: 'p6',
+    title: 'فضای اداری شرکت رایان',
+    city: 'تهران، ونک',
+    cityKey: 'تهران',
+    category: 'office',
+    usage: 'office',
+    badge: 'فضای اداری',
+    area: 900,
+    img: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=70',
+    gradient: 'linear-gradient(135deg,#1f2937 0%,#334155 45%,#3ea63e 120%)',
+  },
+  {
+    id: 'p7',
+    title: 'پارک و پردیسان',
+    city: 'شیراز، پردیسان',
+    cityKey: 'شیراز',
+    category: 'park',
+    usage: 'public',
+    badge: 'پارک و فضای عمومی',
+    area: 3000,
+    img: 'https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&w=800&q=70',
+    gradient: 'linear-gradient(135deg,#38bdf8,#0ea5e9 60%,#16a34a)',
+  },
+  {
+    id: 'p8',
+    title: 'زمین فوتسال باشگاه انقلاب',
+    city: 'تهران، انقلاب',
+    cityKey: 'تهران',
+    category: 'sport',
+    usage: 'sport',
+    badge: 'زمین ورزشی',
+    area: 1000,
+    img: 'https://images.unsplash.com/photo-1605117882932-f9e32b03fea9?auto=format&fit=crop&w=800&q=70',
+    gradient: 'linear-gradient(135deg,#22c55e 0%,#15803d 60%,#064e3b 120%)',
+  },
+  {
+    id: 'p9',
+    title: 'محوطه تجاری پاساژ الماس',
+    city: 'کرج، عظیمیه',
+    cityKey: 'کرج و البرز',
+    category: 'office',
+    usage: 'commercial',
+    badge: 'محوطه تجاری',
+    area: 2000,
+    img: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=800&q=70',
+    gradient: 'linear-gradient(135deg,#38bdf8,#0ea5e9 55%,#15803d 120%)',
+  },
+]
+
 // لینک‌های منو
 export const navLinks = [
   { label: 'صفحه اصلی', type: 'route', to: '/', match: '/' },
   { label: 'محصولات', type: 'route', to: '/products', match: '/products', dropdown: true },
-  { label: 'پروژه‌ها', type: 'hash', id: 'projects' },
+  { label: 'پروژه‌ها', type: 'route', to: '/projects', match: '/projects' },
   { label: 'خدمات', type: 'hash', id: 'features' },
   { label: 'درباره ما', type: 'hash', id: 'about' },
   { label: 'تماس با ما', type: 'hash', id: 'contact' },

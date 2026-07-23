@@ -5,7 +5,7 @@ import Logo from './Logo.jsx'
 const quickLinks = [
   { label: 'صفحه اصلی', type: 'route', to: '/' },
   { label: 'محصولات', type: 'route', to: '/products' },
-  { label: 'پروژه‌ها', type: 'hash', id: 'projects' },
+  { label: 'پروژه‌ها', type: 'route', to: '/projects' },
   { label: 'درباره ما', type: 'hash', id: 'about' },
   { label: 'تماس با ما', type: 'hash', id: 'contact' },
 ]
