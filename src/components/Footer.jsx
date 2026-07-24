@@ -99,7 +99,7 @@ export default function Footer() {
               <li className="flex items-start gap-2.5">
                 <MapPin size={18} className="mt-0.5 shrink-0 text-brand-400" />
                 <span className="leading-7 text-slate-400">
-                  تهران، شهرک صنعتی شهاب، صنعت ۱۴، پلاک ۴۵
+                  کرج، بلوار یادگار امام شمال، نبش بلال ۷، مجتمع نور هشتم
                 </span>
               </li>
               <li className="flex items-center gap-2.5">

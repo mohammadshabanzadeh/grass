@@ -4,15 +4,17 @@ export default function Logo({ light = false, size = 'md' }) {
   const [imgOk, setImgOk] = useState(true)
   const heightClass = size === 'lg' ? 'h-16' : 'h-12'
 
-  // لوگوی تصویری (public/logo.png) — خط سوم (تگ‌لاین) با کراپ از پایین حذف می‌شود
+  // لوگوی تصویری (public/logo.jpg) — خط سوم (تگ‌لاین) با کراپ از پایین حذف می‌شود
   if (imgOk) {
     return (
       <div
-        className={`${heightClass} overflow-hidden`}
-        style={{ aspectRatio: '1 / 0.84' }}
+        className={`${heightClass} overflow-hidden rounded-xl ${
+          light ? '' : 'ring-1 ring-black/5'
+        }`}
+        style={{ aspectRatio: '1 / 0.82' }}
       >
         <img
-          src="/logo.png"
+          src="/logo.jpg"
           alt="فراز چمن"
           onError={() => setImgOk(false)}
           className="h-full w-full object-cover object-top"
