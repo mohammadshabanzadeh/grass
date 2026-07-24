@@ -1,4 +1,27 @@
+import { useState } from 'react'
+
 export default function Logo({ light = false, size = 'md' }) {
+  const [imgOk, setImgOk] = useState(true)
+  const heightClass = size === 'lg' ? 'h-16' : 'h-12'
+
+  // لوگوی تصویری (public/logo.png) — خط سوم (تگ‌لاین) با کراپ از پایین حذف می‌شود
+  if (imgOk) {
+    return (
+      <div
+        className={`${heightClass} overflow-hidden`}
+        style={{ aspectRatio: '1 / 0.84' }}
+      >
+        <img
+          src="/logo.png"
+          alt="فراز چمن"
+          onError={() => setImgOk(false)}
+          className="h-full w-full object-cover object-top"
+        />
+      </div>
+    )
+  }
+
+  // نسخه‌ی جایگزین متنی
   const iconSize = size === 'lg' ? 44 : 38
   const titleColor = light ? 'text-white' : 'text-brand-700'
   const subColor = light ? 'text-white/70' : 'text-slate-400'

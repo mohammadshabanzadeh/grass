@@ -34,16 +34,16 @@ export default function Hero() {
             initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
-            className="glass-brand w-full max-w-xl rounded-3xl p-7 text-white sm:p-9"
+            className="glass-strong w-full max-w-xl rounded-3xl p-7 text-slate-800 sm:p-9"
           >
             <motion.div
               variants={fadeUp}
               initial="hidden"
               animate="show"
               custom={0}
-              className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-1.5 text-xs font-medium backdrop-blur sm:text-sm"
+              className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-100 bg-brand-50/80 px-4 py-1.5 text-xs font-semibold text-brand-700 sm:text-sm"
             >
-              <span className="h-2 w-2 animate-pulse-dot rounded-full bg-brand-300" />
+              <span className="h-2 w-2 animate-pulse-dot rounded-full bg-brand-500" />
               زیبایی ماندگار، کیفیت بی‌نظیر
             </motion.div>
 
@@ -52,11 +52,11 @@ export default function Hero() {
               initial="hidden"
               animate="show"
               custom={1}
-              className="text-4xl font-extrabold leading-[1.25] sm:text-5xl"
+              className="text-4xl font-extrabold leading-[1.25] text-slate-800 sm:text-5xl"
             >
               فروش و نصب
               <br />
-              <span className="text-brand-300">چمن مصنوعی</span>
+              <span className="text-brand-600">چمن مصنوعی</span>
             </motion.h2>
 
             <motion.p
@@ -64,7 +64,7 @@ export default function Hero() {
               initial="hidden"
               animate="show"
               custom={2}
-              className="mt-5 max-w-lg text-sm leading-8 text-white/85 sm:text-base"
+              className="mt-5 max-w-lg text-sm leading-8 text-slate-600 sm:text-base"
             >
               با استفاده از بهترین متریال و جدیدترین تکنولوژی، فضایی سبز و دلنشین
               برای محیط زندگی، کار و ورزش خود ایجاد کنید.
@@ -79,14 +79,14 @@ export default function Hero() {
             >
               <a
                 href="#products"
-                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-brand-700 shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl"
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-600/30 transition hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-xl"
               >
                 مشاهده محصولات
                 <ArrowLeft size={18} className="transition group-hover:-translate-x-1" />
               </a>
               <a
                 href="#contact"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/15 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-md transition hover:bg-white/25"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-200 bg-white/60 px-6 py-3.5 text-sm font-bold text-brand-700 backdrop-blur-md transition hover:bg-white"
               >
                 <Phone size={17} />
                 دریافت مشاوره رایگان
@@ -97,7 +97,7 @@ export default function Hero() {
       </div>
 
       {/* منحنی پایین هیرو (هم‌رنگ پس‌زمینه) */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 rounded-t-[3rem] bg-[#eef3fb] sm:h-20" />
+      <div className="absolute bottom-0 left-0 right-0 h-16 rounded-t-[3rem] bg-[#eef4fc] sm:h-20" />
     </section>
   )
 }
