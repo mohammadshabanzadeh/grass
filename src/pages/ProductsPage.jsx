@@ -13,7 +13,7 @@ export default function ProductsPage() {
   return (
     <>
       <ProductsHero />
-      <Features items={productFeatures} />
+      <Features items={productFeatures} overlapClass="-mt-12 sm:-mt-14" />
       <ProductsCatalog />
       <CTA />
       <Features items={serviceFeatures} overlap={false} />

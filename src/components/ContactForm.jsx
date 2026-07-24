@@ -29,11 +29,11 @@ export default function ContactForm() {
       transition={{ duration: 0.6 }}
       className="glass rounded-3xl p-7 sm:p-8"
     >
-      <div className="mb-6 flex items-center justify-between">
-        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/30">
+      <div className="mb-6 flex items-center justify-start gap-2.5">
+        <h3 className="text-lg font-extrabold text-slate-800 sm:text-xl">برای ما پیام بگذارید</h3>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/30">
           <MessageSquare size={20} />
         </span>
-        <h3 className="text-lg font-extrabold text-slate-800 sm:text-xl">برای ما پیام بگذارید</h3>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">

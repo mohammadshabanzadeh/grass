@@ -31,7 +31,7 @@ export default function AboutStats() {
                 <Icon size={24} />
               </span>
               <p className="mt-1 text-xl font-extrabold text-brand-600 sm:text-2xl">{s.value}</p>
-              <p className="text-sm text-slate-500">{s.label}</p>
+              <p className="text-sm text-slate-600">{s.label}</p>
             </motion.div>
           )
         })}

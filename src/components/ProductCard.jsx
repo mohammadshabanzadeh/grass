@@ -59,7 +59,7 @@ const ProductCard = forwardRef(function ProductCard(
             </span>
             <h4 className="text-lg font-extrabold text-slate-800">{p.title}</h4>
           </div>
-          <p className="text-sm leading-7 text-slate-500">{p.desc}</p>
+          <p className="text-sm leading-7 text-slate-600">{p.desc}</p>
           <a
             href="#"
             className="mt-3 inline-flex w-fit items-center gap-1.5 text-sm font-bold text-brand-600 transition hover:gap-2.5"
@@ -109,7 +109,7 @@ const ProductCard = forwardRef(function ProductCard(
 
       <div className="px-5 pb-6 pt-10 text-center">
         <h4 className="text-lg font-extrabold text-slate-800">{p.title}</h4>
-        <p className="mx-auto mt-2 max-w-[16rem] text-sm leading-7 text-slate-500">{p.desc}</p>
+        <p className="mx-auto mt-2 max-w-[16rem] text-sm leading-7 text-slate-600">{p.desc}</p>
         <a
           href="#"
           className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-brand-600 transition hover:gap-2.5"

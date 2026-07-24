@@ -17,7 +17,7 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <Features id="features" />
+      <Features id="features" glassClass="glass" overlapClass="-mt-28 sm:-mt-32" />
       <Products />
       <Stats />
       <Projects />

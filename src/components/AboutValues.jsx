@@ -29,7 +29,7 @@ export default function AboutValues() {
                   <Icon size={28} />
                 </div>
                 <h4 className="mb-2 text-base font-extrabold text-slate-800">{v.title}</h4>
-                <p className="text-sm leading-7 text-slate-500">{v.desc}</p>
+                <p className="text-sm leading-7 text-slate-600">{v.desc}</p>
               </motion.article>
             )
           })}

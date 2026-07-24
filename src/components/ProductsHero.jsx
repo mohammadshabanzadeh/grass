@@ -25,8 +25,8 @@ export default function ProductsHero() {
           gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
           className="absolute inset-0 h-full w-full"
         />
-        {/* لایه‌ی تیره‌ی شیشه‌ای از راست */}
-        <div className="absolute inset-0 bg-gradient-to-l from-slate-950/85 via-slate-900/55 to-slate-900/10" />
+        {/* گرادیانت مشکی شیشه‌ای از راست به چپ */}
+        <div className="absolute inset-0 bg-gradient-to-l from-black/85 from-20% via-black/45 to-transparent backdrop-blur-[1px]" />
 
         {/* حباب تزئینی */}
         <motion.div
@@ -51,7 +51,7 @@ export default function ProductsHero() {
             initial="hidden"
             animate="show"
             custom={1}
-            className="text-4xl font-extrabold sm:text-6xl"
+            className="text-4xl font-extrabold text-white drop-shadow sm:text-6xl"
           >
             محصولات
           </motion.h1>
@@ -61,9 +61,10 @@ export default function ProductsHero() {
             initial="hidden"
             animate="show"
             custom={2}
-            className="text-lg font-bold text-brand-200 sm:text-2xl"
+            className="text-lg font-bold sm:text-2xl"
           >
-            انواع چمن مصنوعی با کیفیت بالا
+            <span className="text-white">انواع چمن مصنوعی با </span>
+            <span className="text-brand-300">کیفیت بالا</span>
           </motion.h2>
 
           <motion.p

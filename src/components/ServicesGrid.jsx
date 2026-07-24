@@ -34,7 +34,7 @@ export default function ServicesGrid() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="glass group relative overflow-hidden rounded-3xl p-7 transition duration-300 hover:-translate-y-2 hover:shadow-soft"
+                className="glass group relative flex flex-col items-center overflow-hidden rounded-3xl p-7 text-center transition duration-300 hover:-translate-y-2 hover:shadow-soft"
               >
                 {/* شماره کم‌رنگ */}
                 <span className="pointer-events-none absolute -left-2 -top-4 text-7xl font-black text-brand-500/10">
@@ -49,7 +49,7 @@ export default function ServicesGrid() {
                 </div>
 
                 <h4 className="mb-2 text-lg font-extrabold text-slate-800">{s.title}</h4>
-                <p className="text-sm leading-8 text-slate-500">{s.desc}</p>
+                <p className="text-sm leading-8 text-slate-600">{s.desc}</p>
 
                 <div className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-brand-600 opacity-0 transition-all duration-300 group-hover:gap-2.5 group-hover:opacity-100">
                   اطلاعات بیشتر

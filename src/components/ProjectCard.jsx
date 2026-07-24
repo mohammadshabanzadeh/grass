@@ -29,7 +29,7 @@ const ProjectCard = forwardRef(function ProjectCard({ p, index = 0, view = 'grid
         </div>
         <div className="flex flex-1 flex-col justify-center p-5 text-right">
           <h4 className="text-lg font-extrabold text-slate-800">{p.title}</h4>
-          <p className="mt-2 flex items-center gap-1.5 text-sm text-slate-500">
+          <p className="mt-2 flex items-center gap-1.5 text-sm text-slate-600">
             <MapPin size={15} className="text-brand-500" />
             {p.city}
           </p>
@@ -71,7 +71,7 @@ const ProjectCard = forwardRef(function ProjectCard({ p, index = 0, view = 'grid
 
       <div className="p-5 text-center">
         <h4 className="text-lg font-extrabold text-slate-800">{p.title}</h4>
-        <p className="mt-2 flex items-center justify-center gap-1.5 text-sm text-slate-500">
+        <p className="mt-2 flex items-center justify-center gap-1.5 text-sm text-slate-600">
           <MapPin size={15} className="text-brand-500" />
           {p.city}
         </p>

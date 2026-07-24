@@ -95,8 +95,8 @@ export default function ProjectsHero() {
             className="relative order-1 min-h-[240px] lg:order-2 lg:min-h-full"
           >
             <SmartImage
-              src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80"
-              alt="نمونه پروژه اجرا شده"
+              src="https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=1200&q=80"
+              alt="نمونه پروژه چمن مصنوعی اجرا شده"
               gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
               className="absolute inset-0 h-full w-full"
             />

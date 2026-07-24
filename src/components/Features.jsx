@@ -24,19 +24,21 @@ const iconMap = {
   wrench: Wrench,
 }
 
-export default function Features({ items = defaultFeatures, overlap = true, id }) {
+export default function Features({
+  items = defaultFeatures,
+  overlap = true,
+  overlapClass,
+  glassClass = 'glass-strong',
+  id,
+}) {
+  const marginClass = overlapClass ?? (overlap ? '-mt-24 sm:-mt-28' : 'mt-4')
   return (
-    <div
-      id={id}
-      className={`container-x relative z-30 ${
-        overlap ? '-mt-24 sm:-mt-28' : 'mt-4'
-      }`}
-    >
+    <div id={id} className={`container-x relative z-30 ${marginClass}`}>
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
-        className="glass-strong grid grid-cols-2 gap-px overflow-hidden rounded-3xl lg:grid-cols-4"
+        className={`${glassClass} grid grid-cols-2 gap-px overflow-hidden rounded-3xl lg:grid-cols-4`}
       >
         {items.map((f, i) => {
           const Icon = iconMap[f.icon] || BadgeCheck
@@ -52,8 +54,8 @@ export default function Features({ items = defaultFeatures, overlap = true, id }
                 <Icon size={24} />
               </div>
               <div className="text-right">
-                <p className="text-sm font-extrabold text-slate-800 sm:text-base">{f.title}</p>
-                <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">{f.desc}</p>
+                <p className="text-sm font-extrabold text-slate-900 sm:text-base">{f.title}</p>
+                <p className="mt-0.5 text-xs font-medium text-slate-600 sm:text-sm">{f.desc}</p>
               </div>
             </motion.div>
           )

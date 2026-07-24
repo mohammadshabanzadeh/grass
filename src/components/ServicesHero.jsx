@@ -28,7 +28,8 @@ export default function ServicesHero() {
           gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
           className="absolute inset-0 h-full w-full"
         />
-        <div className="absolute inset-0 bg-gradient-to-l from-slate-950/85 via-slate-900/55 to-slate-900/15" />
+        {/* گرادیانت مشکی شیشه‌ای از راست به چپ */}
+        <div className="absolute inset-0 bg-gradient-to-l from-black/85 from-20% via-black/45 to-transparent backdrop-blur-[1px]" />
         <motion.div
           animate={{ y: [0, -14, 0] }}
           transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
@@ -51,11 +52,11 @@ export default function ServicesHero() {
             initial="hidden"
             animate="show"
             custom={1}
-            className="text-3xl font-extrabold leading-tight sm:text-5xl"
+            className="text-3xl font-extrabold leading-tight text-white drop-shadow sm:text-5xl"
           >
             از مشاوره تا اجرا،
             <br />
-            <span className="text-brand-200">همراه شما هستیم</span>
+            <span className="text-brand-300">همراه شما هستیم</span>
           </motion.h1>
 
           <motion.p

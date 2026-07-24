@@ -26,7 +26,7 @@ export default function AboutStory() {
                 </span>
                 <div className="text-right">
                   <p className="text-sm font-extrabold text-slate-800">{row.label}</p>
-                  <p className="mt-0.5 text-sm leading-7 text-slate-500">{row.value}</p>
+                  <p className="mt-0.5 text-sm leading-7 text-slate-600">{row.value}</p>
                 </div>
               </div>
             )
@@ -42,8 +42,8 @@ export default function AboutStory() {
           className="order-2 min-h-[260px] lg:col-span-4"
         >
           <SmartImage
-            src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
-            alt="پروژه اجرا شده"
+            src="https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=800&q=80"
+            alt="چمن مصنوعی اجرا شده"
             gradient="linear-gradient(135deg,#334155,#0f172a 70%,#16a34a)"
             className="h-full min-h-[260px] w-full rounded-3xl shadow-card"
           />
@@ -61,13 +61,13 @@ export default function AboutStory() {
           <h3 className="text-2xl font-extrabold leading-relaxed text-slate-800 sm:text-3xl">
             از یک ایده تا تبدیل شدن به مرجع تخصصی چمن مصنوعی
           </h3>
-          <p className="mt-5 text-sm leading-8 text-slate-500">
+          <p className="mt-5 text-sm leading-8 text-slate-600">
             فراز چمن فعالیت خود را با هدف ارائه‌ی بهترین راهکارهای فضای سبز مصنوعی
             آغاز کرد. ما باور داریم که هر فضایی، شایسته‌ی داشتن چمنی زیبا، باکیفیت
             و بادوام است. به همین دلیل از ابتدا تمرکز خود را بر کیفیت محصول، اجرای
             استاندارد و رضایت مشتری قرار دادیم.
           </p>
-          <p className="mt-4 text-sm leading-8 text-slate-500">
+          <p className="mt-4 text-sm leading-8 text-slate-600">
             امروز، با افتخار در کنار شما هستیم تا فضاهایی سبز، زیبا و ماندگار برای
             خانه‌ها، ویلاها، مجموعه‌های ورزشی، تجاری و عمومی خلق کنیم.
           </p>

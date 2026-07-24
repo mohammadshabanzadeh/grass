@@ -497,8 +497,8 @@ export const faqs = [
 
 // ===== صفحه درباره ما =====
 export const aboutInfo = [
-  { label: 'تاسیس', value: '۱۳۹۴', icon: 'calendar' },
-  { label: 'موقعیت', value: 'تهران، ایران', icon: 'pin' },
+  { label: 'تاسیس', value: '۱۳۹۶', icon: 'calendar' },
+  { label: 'موقعیت', value: 'البرز، کرج', icon: 'pin' },
   { label: 'حوزه فعالیت', value: 'فروش و نصب چمن مصنوعی', icon: 'grid' },
   { label: 'ماموریت ما', value: 'ارائه بهترین کیفیت با قیمت مناسب و خدمات حرفه‌ای', icon: 'target' },
 ]
@@ -550,8 +550,8 @@ export const contactMapSrc =
   'https://maps.google.com/maps?q=Tehran%2C%20Iran&z=12&output=embed'
 
 export const contactCards = [
-  { icon: 'phone', label: 'تلفن تماس', value: '۰۲۱ ۴۵۶۷ ۸۹۰۱', href: 'tel:02145678901' },
-  { icon: 'whatsapp', label: 'واتساپ', value: '۰۹۱۲ ۱۲۳ ۴۵۶۷', href: 'https://wa.me/989121234567' },
+  { icon: 'phone', label: 'تلفن تماس', value: '۰۹۱۲ ۳۳۶ ۵۴۳۰', href: 'tel:09123365430' },
+  { icon: 'whatsapp', label: 'واتساپ', value: '۰۹۱۲ ۳۳۶ ۵۴۳۰', href: 'https://wa.me/989123365430' },
   { icon: 'mail', label: 'ایمیل', value: 'info@farazchaman.ir', href: 'mailto:info@farazchaman.ir' },
   { icon: 'clock', label: 'ساعات کاری', value: 'شنبه تا پنجشنبه', sub: '۹:۰۰ الی ۱۸:۰۰' },
 ]
