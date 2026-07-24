@@ -67,8 +67,8 @@ export default function Navbar() {
               <a
                 href={link.type === 'route' ? link.to : `#${link.id}`}
                 onClick={(e) => handleNav(e, link)}
-                className={`flex items-center gap-1 text-sm font-semibold transition-colors ${
-                  isActive(link) ? 'text-brand-600' : 'text-slate-600 hover:text-brand-600'
+                className={`flex items-center gap-1 text-sm font-bold transition-colors ${
+                  isActive(link) ? 'text-brand-700' : 'text-slate-800 hover:text-brand-700'
                 }`}
               >
                 {link.label}
@@ -77,7 +77,7 @@ export default function Navbar() {
                 )}
               </a>
               <span
-                className={`absolute -bottom-1.5 right-0 h-0.5 rounded bg-brand-600 transition-all duration-300 ${
+                className={`absolute -bottom-1.5 right-0 h-0.5 rounded bg-brand-700 transition-all duration-300 ${
                   isActive(link) ? 'w-full' : 'w-0 group-hover:w-full'
                 }`}
               />
@@ -121,8 +121,8 @@ export default function Navbar() {
                   <a
                     href={link.type === 'route' ? link.to : `#${link.id}`}
                     onClick={(e) => handleNav(e, link)}
-                    className={`flex items-center justify-between py-3 text-sm font-semibold hover:text-brand-600 ${
-                      isActive(link) ? 'text-brand-600' : 'text-slate-800'
+                    className={`flex items-center justify-between py-3 text-sm font-bold hover:text-brand-700 ${
+                      isActive(link) ? 'text-brand-700' : 'text-slate-800'
                     }`}
                   >
                     {link.label}
