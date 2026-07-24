@@ -539,21 +539,22 @@ export const aboutValues = [
 ]
 
 export const workingHours = [
-  { day: 'شنبه تا چهارشنبه', time: '۹:۰۰ تا ۱۸:۰۰' },
-  { day: 'پنجشنبه', time: '۹:۰۰ تا ۱۳:۰۰' },
+  { day: 'شنبه تا چهارشنبه', time: '۸:۰۰ تا ۱۷:۰۰' },
+  { day: 'پنجشنبه', time: '۸:۰۰ تا ۱۳:۰۰' },
 ]
 
 // ===== صفحه تماس با ما =====
-export const contactAddress = 'تهران، شهرک صنعتی شهاب، صنعت ۱۳، پلاک ۴۵'
+export const contactAddress = 'کرج - بلوار یادگار امام شمال - نبش بلال ۷ - مجتمع نور هشتم'
 export const contactPostal = '۱۴۵۸۴۶۵۳۴۷۱'
+// مختصات: 35°49'23.3"N 50°57'50.5"E
 export const contactMapSrc =
-  'https://maps.google.com/maps?q=Tehran%2C%20Iran&z=12&output=embed'
+  'https://maps.google.com/maps?q=35.823139,50.964028&z=17&hl=fa&output=embed'
 
 export const contactCards = [
   { icon: 'phone', label: 'تلفن تماس', value: '۰۹۱۲ ۳۳۶ ۵۴۳۰', href: 'tel:09123365430' },
   { icon: 'whatsapp', label: 'واتساپ', value: '۰۹۱۲ ۳۳۶ ۵۴۳۰', href: 'https://wa.me/989123365430' },
   { icon: 'mail', label: 'ایمیل', value: 'info@farazchaman.ir', href: 'mailto:info@farazchaman.ir' },
-  { icon: 'clock', label: 'ساعات کاری', value: 'شنبه تا پنجشنبه', sub: '۹:۰۰ الی ۱۸:۰۰' },
+  { icon: 'clock', label: 'ساعات کاری', value: 'شنبه تا پنجشنبه', sub: '۸:۰۰ الی ۱۷:۰۰' },
 ]
 
 // لینک‌های منو

@@ -19,11 +19,11 @@ export default function ContactLocation() {
       transition={{ duration: 0.6 }}
       className="glass rounded-3xl p-7 sm:p-8"
     >
-      <div className="mb-4 flex items-center justify-start gap-3">
-        <h3 className="text-lg font-extrabold text-slate-800 sm:text-xl">ما کجاییم؟</h3>
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/30">
-          <MapPin size={20} />
+      <div className="mb-4 text-right">
+        <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/30">
+          <MapPin size={22} />
         </span>
+        <h3 className="text-lg font-extrabold text-slate-800 sm:text-xl">ما کجاییم؟</h3>
       </div>
 
       <div className="text-right">
@@ -54,7 +54,10 @@ export default function ContactLocation() {
                 <Icon size={20} />
               </span>
               <p className="text-xs font-extrabold text-slate-800">{c.label}</p>
-              <p className="text-[11px] leading-5 text-slate-600" dir={c.icon === 'mail' ? 'ltr' : undefined}>
+              <p
+                className="text-[11px] leading-5 text-slate-600"
+                dir={['mail', 'phone', 'whatsapp'].includes(c.icon) ? 'ltr' : undefined}
+              >
                 {c.value}
               </p>
               {c.sub && <p className="text-[11px] leading-4 text-slate-600">{c.sub}</p>}
