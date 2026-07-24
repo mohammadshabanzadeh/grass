@@ -61,7 +61,9 @@ const ProductCard = forwardRef(function ProductCard(
           </div>
           <p className="text-sm leading-7 text-slate-600">{p.desc}</p>
           <a
-            href="#"
+            href={p.link || '#'}
+            target={p.link ? '_blank' : undefined}
+            rel={p.link ? 'noreferrer' : undefined}
             className="mt-3 inline-flex w-fit items-center gap-1.5 text-sm font-bold text-brand-600 transition hover:gap-2.5"
           >
             {linkText}
@@ -111,7 +113,9 @@ const ProductCard = forwardRef(function ProductCard(
         <h4 className="text-lg font-extrabold text-slate-800">{p.title}</h4>
         <p className="mx-auto mt-2 max-w-[16rem] text-sm leading-7 text-slate-600">{p.desc}</p>
         <a
-          href="#"
+          href={p.link || '#'}
+          target={p.link ? '_blank' : undefined}
+          rel={p.link ? 'noreferrer' : undefined}
           className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-brand-600 transition hover:gap-2.5"
         >
           {linkText}

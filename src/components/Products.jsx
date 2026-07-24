@@ -1,11 +1,25 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ChevronRight, MoreVertical } from 'lucide-react'
 import SectionHeading from './SectionHeading.jsx'
 import ProductCard from './ProductCard.jsx'
-import { products } from '../data.js'
+import { products as fallbackProducts } from '../data.js'
+import { fetchProducts } from '../lib/wp.js'
 
 export default function Products() {
   const trackRef = useRef(null)
+  const [items, setItems] = useState(fallbackProducts)
+
+  useEffect(() => {
+    let alive = true
+    fetchProducts()
+      .then((list) => {
+        if (alive && list.length) setItems(list.slice(0, 8))
+      })
+      .catch(() => {})
+    return () => {
+      alive = false
+    }
+  }, [])
 
   const scrollBy = (dir) => {
     const el = trackRef.current
@@ -38,7 +52,7 @@ export default function Products() {
           </div>
 
           <div ref={trackRef} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {products.map((p, i) => (
+            {items.slice(0, 4).map((p, i) => (
               <ProductCard key={p.id} p={p} index={i} linkText="مشاهده محصول" />
             ))}
           </div>

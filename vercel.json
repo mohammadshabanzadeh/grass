@@ -1,3 +1,9 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/wpapi/:path*",
+      "destination": "https://api.farazchaman.ir/wp-json/:path*"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
