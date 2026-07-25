@@ -17,7 +17,7 @@ export default function Hero() {
       {/* تصویر پس‌زمینه */}
       <div className="absolute inset-0">
         <SmartImage
-          src="https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=1600&q=80"
+          src="/images/artificial-grass-07.jpg"
           alt="چمن مصنوعی سبز و خیره‌کننده"
           gradient="linear-gradient(120deg,#0f2417 0%,#14532d 40%,#1e3a8a 130%)"
           className="h-full w-full"

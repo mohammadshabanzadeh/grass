@@ -42,7 +42,7 @@ export default function AboutStory() {
           className="order-2 min-h-[260px] lg:col-span-4"
         >
           <SmartImage
-            src="https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=800&q=80"
+            src="/images/artificial-grass-07.jpg"
             alt="چمن مصنوعی اجرا شده"
             gradient="linear-gradient(135deg,#334155,#0f172a 70%,#16a34a)"
             className="h-full min-h-[260px] w-full rounded-3xl shadow-card"

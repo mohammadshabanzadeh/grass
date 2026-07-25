@@ -24,7 +24,7 @@ export default function AboutHero() {
           {/* تصویر با لبه‌ی منحنی (چپ در RTL) */}
           <div className="relative order-2 min-h-[260px] lg:min-h-[440px]">
             <SmartImage
-              src="https://images.unsplash.com/photo-1592595896551-12b371d546d5?auto=format&fit=crop&w=1200&q=80"
+              src="/images/artificial-grass-03.jpg"
               alt="چمن مصنوعی اجرا شده توسط فراز چمن"
               gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
               className="about-hero-clip absolute inset-0 h-full w-full lg:rounded-l-[2rem]"

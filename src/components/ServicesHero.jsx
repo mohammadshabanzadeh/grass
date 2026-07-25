@@ -23,7 +23,7 @@ export default function ServicesHero() {
         className="relative overflow-hidden rounded-[2rem] shadow-soft"
       >
         <SmartImage
-          src="https://images.unsplash.com/photo-1605117882932-f9e32b03fea9?auto=format&fit=crop&w=1600&q=80"
+          src="/images/artificial-grass-06.jpg"
           alt="خدمات چمن مصنوعی"
           gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
           className="absolute inset-0 h-full w-full"

@@ -19,7 +19,7 @@ export default function CTA({
         className="relative overflow-hidden rounded-3xl px-6 py-12 shadow-soft sm:px-12 sm:py-14"
       >
         <SmartImage
-          src="https://images.unsplash.com/photo-1605117882932-f9e32b03fea9?auto=format&fit=crop&w=1400&q=70"
+          src="/images/artificial-grass-06.jpg"
           alt=""
           gradient="linear-gradient(100deg,#1d4ed8 0%,#2563eb 55%,#16a34a 130%)"
           className="absolute inset-0 h-full w-full"
