@@ -20,7 +20,7 @@ export default function ProductsHero() {
         className="relative mb-6 overflow-hidden rounded-[2rem] shadow-soft sm:mb-8"
       >
         <SmartImage
-          src="https://images.unsplash.com/photo-1592595896551-12b371d546d5?auto=format&fit=crop&w=1600&q=80"
+          src="/products-hero-grass.jpg"
           alt="چمن مصنوعی سبز و پرپشت"
           gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
           className="absolute inset-0 h-full w-full"
