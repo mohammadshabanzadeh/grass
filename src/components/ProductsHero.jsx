@@ -35,7 +35,7 @@ export default function ProductsHero() {
           className="pointer-events-none absolute -left-10 top-6 h-40 w-40 rounded-full bg-brand-400/25 blur-3xl"
         />
 
-        <div className="relative flex min-h-[230px] flex-col items-end justify-center gap-3 p-8 text-right text-white sm:min-h-[300px] sm:p-12">
+        <div className="relative flex min-h-[230px] flex-col items-start justify-center gap-3 p-8 text-right text-white sm:min-h-[300px] sm:p-12">
           <motion.span
             variants={fadeUp}
             initial="hidden"
