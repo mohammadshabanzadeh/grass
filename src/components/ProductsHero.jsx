@@ -17,16 +17,16 @@ export default function ProductsHero() {
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="relative overflow-hidden rounded-[2rem] shadow-soft"
+        className="relative mb-6 overflow-hidden rounded-[2rem] shadow-soft sm:mb-8"
       >
         <SmartImage
-          src="https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=1600&q=80"
-          alt="چمن مصنوعی"
+          src="https://images.unsplash.com/photo-1592595896551-12b371d546d5?auto=format&fit=crop&w=1600&q=80"
+          alt="چمن مصنوعی سبز و پرپشت"
           gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
           className="absolute inset-0 h-full w-full"
         />
         {/* گرادیانت مشکی شیشه‌ای از راست به چپ */}
-        <div className="absolute inset-0 bg-gradient-to-l from-black/85 from-20% via-black/45 to-transparent backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-gradient-to-l from-black/85 from-20% via-black/45 to-transparent backdrop-blur-[2px]" />
 
         {/* حباب تزئینی */}
         <motion.div
