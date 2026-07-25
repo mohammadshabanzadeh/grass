@@ -1,16 +1,38 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const EASE = [0.76, 0, 0.24, 1]
-const MIN_DURATION = 2200
+const DURATION = 2400
+const faDigits = '۰۱۲۳۴۵۶۷۸۹'
+const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
+
+// دایره‌ی پیشرفت دور لوگو
+const R = 92
+const CIRC = 2 * Math.PI * R
 
 export default function Preloader() {
   const [visible, setVisible] = useState(true)
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'
-    const timer = setTimeout(() => setVisible(false), MIN_DURATION)
-    return () => clearTimeout(timer)
+    const start = performance.now()
+    let raf
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / DURATION)
+      setProgress(1 - Math.pow(1 - t, 3)) // ease-out برای حرکت نرم‌تر
+      if (t < 1) raf = requestAnimationFrame(tick)
+      else setVisible(false)
+    }
+    raf = requestAnimationFrame(tick)
+
+    // تضمین بسته‌شدن لودینگ: اگر صفحه در تبِ پس‌زمینه باز شود مرورگر
+    // requestAnimationFrame را متوقف می‌کند و لودینگ برای همیشه باقی می‌ماند.
+    const failsafe = setTimeout(() => setVisible(false), DURATION + 400)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(failsafe)
+    }
   }, [])
 
   useEffect(() => {
@@ -20,111 +42,140 @@ export default function Preloader() {
   return (
     <AnimatePresence>
       {visible && (
-        <>
-          {/* دو لَته‌ی تیره که مثل پرده از هم باز می‌شوند */}
-          <motion.div
-            key="curtain-top"
-            exit={{ y: '-100%' }}
-            transition={{ duration: 0.8, ease: EASE }}
-            className="fixed inset-x-0 top-0 z-[101] h-1/2 bg-[#05070a]"
+        <motion.div
+          key="preloader"
+          exit={{ opacity: 0, scale: 1.07, filter: 'blur(6px)' }}
+          transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden"
+        >
+          {/* تصویر چمن با زوم بسیار آرام */}
+          <motion.img
+            src="/images/artificial-grass-07.jpg"
+            alt=""
+            initial={{ scale: 1.18 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 3.4, ease: 'easeOut' }}
+            className="absolute inset-0 h-full w-full object-cover"
           />
-          <motion.div
-            key="curtain-bottom"
-            exit={{ y: '100%' }}
-            transition={{ duration: 0.8, ease: EASE }}
-            className="fixed inset-x-0 bottom-0 z-[101] h-1/2 bg-[#05070a]"
-          />
 
-          {/* محتوای وسط: لوگو + جلوه‌های نورانی */}
-          <motion.div
-            key="preloader-content"
-            exit={{ opacity: 0, scale: 1.08 }}
-            transition={{ duration: 0.45, ease: 'easeIn' }}
-            className="fixed inset-0 z-[102] flex flex-col items-center justify-center gap-6"
-          >
-            <div className="relative flex h-40 w-40 items-center justify-center">
-              {/* هاله‌های نورانی متحرک پشت لوگو */}
-              <motion.span
-                animate={{ scale: [1, 1.35, 1], opacity: [0.45, 0.85, 0.45] }}
-                transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute h-36 w-36 rounded-full bg-brand-500/40 blur-3xl"
+          {/* لایه‌ی شیشه‌ای روشن روی تصویر (هماهنگ با تم سایت) */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/60 to-brand-50/75 backdrop-blur-md" />
+          {/* هاله‌ی نور مرکزی */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(255,255,255,0.85)_0%,transparent_55%)]" />
+
+          {/* ===== لوگو + حلقه‌ی لودینگ ===== */}
+          <div className="relative flex h-56 w-56 items-center justify-center sm:h-72 sm:w-72">
+            {/* هاله‌های نرم پشت لوگو */}
+            <motion.span
+              animate={{ scale: [1, 1.25, 1], opacity: [0.35, 0.6, 0.35] }}
+              transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute h-40 w-40 rounded-full bg-brand-400/40 blur-3xl sm:h-52 sm:w-52"
+            />
+            <motion.span
+              animate={{ scale: [1.2, 0.95, 1.2], opacity: [0.25, 0.5, 0.25] }}
+              transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+              className="absolute h-32 w-32 rounded-full bg-grass-400/40 blur-3xl sm:h-44 sm:w-44"
+            />
+
+            {/* حلقه‌ها */}
+            <svg viewBox="0 0 200 200" className="absolute h-full w-full -rotate-90">
+              <defs>
+                <linearGradient id="fcp-ring" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#2563eb" />
+                  <stop offset="60%" stopColor="#3ea63e" />
+                  <stop offset="100%" stopColor="#6096fa" />
+                </linearGradient>
+              </defs>
+              {/* مسیر خالی */}
+              <circle
+                cx="100"
+                cy="100"
+                r={R}
+                fill="none"
+                stroke="rgba(255,255,255,0.75)"
+                strokeWidth="5"
               />
-              <motion.span
-                animate={{ scale: [1.25, 0.95, 1.25], opacity: [0.35, 0.7, 0.35] }}
-                transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
-                className="absolute h-28 w-28 rounded-full bg-grass-500/35 blur-3xl"
+              {/* مسیر پرشونده بر اساس درصد بارگذاری */}
+              <circle
+                cx="100"
+                cy="100"
+                r={R}
+                fill="none"
+                stroke="url(#fcp-ring)"
+                strokeWidth="5"
+                strokeLinecap="round"
+                strokeDasharray={CIRC}
+                strokeDashoffset={CIRC * (1 - progress)}
+                style={{ filter: 'drop-shadow(0 2px 8px rgba(37,99,235,0.45))' }}
               />
+            </svg>
 
-              {/* حلقه‌ی گرادیانتی چرخان */}
-              <motion.svg
-                viewBox="0 0 100 100"
-                className="absolute h-32 w-32"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2.6, repeat: Infinity, ease: 'linear' }}
-              >
-                <defs>
-                  <linearGradient id="preloader-ring" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#3b74f6" />
-                    <stop offset="55%" stopColor="#5bb85b" />
-                    <stop offset="100%" stopColor="#3b74f6" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="44"
-                  fill="none"
-                  stroke="url(#preloader-ring)"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeDasharray="200 76"
-                />
-              </motion.svg>
-
-              {/* لوگو با جلوه‌ی درخشش عبوری */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.55 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.7, ease: 'easeOut' }}
-                className="relative z-10 h-20 w-20 overflow-hidden rounded-2xl sm:h-24 sm:w-24"
-              >
-                <img src="/logo.png" alt="فراز چمن" className="h-full w-full object-contain" />
-                <motion.span
-                  animate={{ x: ['-130%', '230%'] }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    repeatDelay: 0.7,
-                    ease: 'easeInOut',
-                  }}
-                  className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/80 to-transparent"
-                  style={{ mixBlendMode: 'overlay' }}
-                />
-              </motion.div>
-            </div>
-
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-lg font-extrabold text-white sm:text-xl"
+            {/* قوس نازک چرخان برای حس زنده بودن */}
+            <motion.svg
+              viewBox="0 0 200 200"
+              className="absolute h-[86%] w-[86%]"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 3.2, repeat: Infinity, ease: 'linear' }}
             >
-              فراز چمن
-            </motion.p>
+              <circle
+                cx="100"
+                cy="100"
+                r="78"
+                fill="none"
+                stroke="rgba(37,99,235,0.35)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeDasharray="60 430"
+              />
+            </motion.svg>
 
-            {/* نقطه‌های در حال بارگذاری */}
-            <div className="flex items-center gap-1.5">
-              {[0, 1, 2].map((i) => (
-                <motion.span
-                  key={i}
-                  animate={{ opacity: [0.3, 1, 0.3], y: [0, -4, 0] }}
-                  transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.15 }}
-                  className="h-1.5 w-1.5 rounded-full bg-brand-400"
-                />
-              ))}
+            {/* لوگوی بزرگ سایت */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="relative z-10 h-28 w-28 overflow-hidden sm:h-36 sm:w-36"
+            >
+              <motion.img
+                src="/logo.png"
+                alt="فراز چمن"
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                className="h-full w-full object-contain drop-shadow-[0_10px_25px_rgba(37,99,235,0.35)]"
+              />
+              {/* درخشش عبوری روی لوگو */}
+              <motion.span
+                animate={{ x: ['-140%', '240%'] }}
+                transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 0.6, ease: 'easeInOut' }}
+                className="pointer-events-none absolute inset-y-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/90 to-transparent"
+              />
+            </motion.div>
+          </div>
+
+          {/* نام برند + درصد */}
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.25 }}
+            className="relative z-10 mt-4 flex flex-col items-center gap-3"
+          >
+            <p className="text-2xl font-extrabold text-brand-700 sm:text-3xl">فراز چمن</p>
+            <p className="text-xs font-medium text-slate-500 sm:text-sm">
+              فروش و نصب چمن مصنوعی
+            </p>
+
+            {/* نوار پیشرفت باریک */}
+            <div className="mt-1 h-1 w-44 overflow-hidden rounded-full bg-white/70 sm:w-56">
+              <div
+                className="h-full rounded-full bg-gradient-to-l from-brand-600 to-grass-500"
+                style={{ width: `${progress * 100}%` }}
+              />
             </div>
+            <p className="text-xs font-bold text-brand-600">
+              {toFa(Math.round(progress * 100))}٪
+            </p>
           </motion.div>
-        </>
+        </motion.div>
       )}
     </AnimatePresence>
   )
