@@ -8,8 +8,13 @@ export default function SmartImage({ src, alt = '', gradient, className = '', im
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
 
+  // اگر className خودش یک کلاس موقعیت (absolute/fixed/sticky) بدهد، «relative»
+  // پیش‌فرض را اضافه نمی‌کنیم چون در Tailwind هر دو روی یک المان تداخل پیدا کرده
+  // و relative برنده می‌شود؛ همین باعث می‌شد تصویر با ارتفاع صفر رندر شود.
+  const hasOwnPosition = /\b(absolute|fixed|sticky|static)\b/.test(className)
+
   return (
-    <div className={`relative overflow-hidden ${className}`}>
+    <div className={`${hasOwnPosition ? '' : 'relative'} overflow-hidden ${className}`}>
       <div
         className="absolute inset-0"
         style={{ background: gradient || 'linear-gradient(135deg,#16a34a,#15803d)' }}
