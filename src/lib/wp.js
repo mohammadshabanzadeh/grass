@@ -42,3 +42,40 @@ export async function fetchCategories() {
   if (!res.ok) throw new Error(`WooCommerce categories failed: ${res.status}`)
   return res.json()
 }
+
+/** یک پست پروژه‌ی وردپرس را به شکل مورد نیاز کارت‌ها/صفحه‌ی اختصاصی نگاشت می‌کند. */
+function mapProject(post) {
+  const meta = post.meta || {}
+  const media = post._embedded?.['wp:featuredmedia']?.[0]
+  return {
+    id: post.id,
+    slug: post.slug,
+    title: stripHtml(post.title?.rendered || ''),
+    excerpt: stripHtml(post.excerpt?.rendered || ''),
+    content: post.content?.rendered || '',
+    img: media?.source_url || null,
+    gallery: Array.isArray(meta.project_gallery) ? meta.project_gallery : [],
+    city: meta.project_city || '',
+    cityKey: meta.project_city_key || '',
+    category: meta.project_category || '',
+    usage: meta.project_usage || '',
+    badge: meta.project_badge || '',
+    area: Number(meta.project_area) || 0,
+  }
+}
+
+/** همه‌ی پروژه‌های منتشرشده را از وردپرس می‌خواند (نوع پست «project»). */
+export async function fetchProjects() {
+  const res = await fetch(`${WP}/wp/v2/project?per_page=100&_embed=wp:featuredmedia`)
+  if (!res.ok) throw new Error(`Projects fetch failed: ${res.status}`)
+  const data = await res.json()
+  return data.map(mapProject)
+}
+
+/** یک پروژه‌ی مشخص را با شناسه‌ی عددی آن از وردپرس می‌خواند. */
+export async function fetchProjectById(id) {
+  const res = await fetch(`${WP}/wp/v2/project/${encodeURIComponent(id)}?_embed=wp:featuredmedia`)
+  if (res.status === 404) return null
+  if (!res.ok) throw new Error(`Project fetch failed: ${res.status}`)
+  return mapProject(await res.json())
+}

@@ -1,5 +1,6 @@
 import { forwardRef } from 'react'
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import { ArrowLeft, MapPin } from 'lucide-react'
 import SmartImage from './SmartImage.jsx'
 
@@ -33,13 +34,13 @@ const ProjectCard = forwardRef(function ProjectCard({ p, index = 0, view = 'grid
             <MapPin size={15} className="text-brand-500" />
             {p.city}
           </p>
-          <a
-            href="#"
+          <Link
+            to={`/projects/${p.id}`}
             className="mt-3 inline-flex w-fit items-center gap-1.5 text-sm font-bold text-brand-600 transition hover:gap-2.5"
           >
             مشاهده جزئیات
             <ArrowLeft size={16} />
-          </a>
+          </Link>
         </div>
       </motion.article>
     )
@@ -75,13 +76,13 @@ const ProjectCard = forwardRef(function ProjectCard({ p, index = 0, view = 'grid
           <MapPin size={15} className="text-brand-500" />
           {p.city}
         </p>
-        <a
-          href="#"
+        <Link
+          to={`/projects/${p.id}`}
           className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-brand-600 transition hover:gap-2.5"
         >
           مشاهده جزئیات
           <ArrowLeft size={16} />
-        </a>
+        </Link>
       </div>
     </motion.article>
   )

@@ -4,6 +4,7 @@ import Footer from './components/Footer.jsx'
 import Home from './pages/Home.jsx'
 import ProductsPage from './pages/ProductsPage.jsx'
 import ProjectsPage from './pages/ProjectsPage.jsx'
+import ProjectDetailPage from './pages/ProjectDetailPage.jsx'
 import ServicesPage from './pages/ServicesPage.jsx'
 import AboutPage from './pages/AboutPage.jsx'
 import ContactPage from './pages/ContactPage.jsx'
@@ -18,6 +19,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/projects/:id" element={<ProjectDetailPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />

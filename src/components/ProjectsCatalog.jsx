@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   SlidersHorizontal,
@@ -10,26 +10,26 @@ import {
   RotateCcw,
   Check,
   SearchX,
+  Loader2,
 } from 'lucide-react'
 import ProjectCard from './ProjectCard.jsx'
-import {
-  allProjects,
-  projectCategories,
-  usageTypes,
-  cities,
-  projectSortOptions,
-} from '../data.js'
+import { projectCategories, usageTypes, projectSortOptions } from '../data.js'
+import { fetchProjects } from '../lib/wp.js'
 
 const faDigits = '۰۱۲۳۴۵۶۷۸۹'
 const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
 
+const ALL_CITIES = 'همه شهرها'
 const AREA_MIN = 0
 const AREA_MAX = 5000
 
 export default function ProjectsCatalog() {
+  const [allProjects, setAllProjects] = useState([])
+  const [status, setStatus] = useState('loading') // loading | ready | error
+
   const [cats, setCats] = useState([])
   const [usages, setUsages] = useState([])
-  const [city, setCity] = useState('همه شهرها')
+  const [city, setCity] = useState(ALL_CITIES)
   const [minA, setMinA] = useState(AREA_MIN)
   const [maxA, setMaxA] = useState(AREA_MAX)
   const [view, setView] = useState('grid')
@@ -38,13 +38,34 @@ export default function ProjectsCatalog() {
   const [cityOpen, setCityOpen] = useState(false)
   const [page, setPage] = useState(1)
 
+  useEffect(() => {
+    let alive = true
+    fetchProjects()
+      .then((data) => {
+        if (!alive) return
+        setAllProjects(data)
+        setStatus('ready')
+      })
+      .catch(() => {
+        if (alive) setStatus('error')
+      })
+    return () => {
+      alive = false
+    }
+  }, [])
+
+  const cities = useMemo(() => {
+    const keys = [...new Set(allProjects.map((p) => p.cityKey).filter(Boolean))]
+    return [ALL_CITIES, ...keys]
+  }, [allProjects])
+
   const toggle = (setter, list, value) =>
     setter(list.includes(value) ? list.filter((v) => v !== value) : [...list, value])
 
   const resetFilters = () => {
     setCats([])
     setUsages([])
-    setCity('همه شهرها')
+    setCity(ALL_CITIES)
     setMinA(AREA_MIN)
     setMaxA(AREA_MAX)
   }
@@ -53,11 +74,11 @@ export default function ProjectsCatalog() {
     return allProjects.filter((p) => {
       const catOk = cats.length === 0 || cats.includes(p.category)
       const usageOk = usages.length === 0 || usages.includes(p.usage)
-      const cityOk = city === 'همه شهرها' || p.cityKey === city
+      const cityOk = city === ALL_CITIES || p.cityKey === city
       const areaOk = p.area >= minA && p.area <= maxA
       return catOk && usageOk && cityOk && areaOk
     })
-  }, [cats, usages, city, minA, maxA])
+  }, [allProjects, cats, usages, city, minA, maxA])
 
   const leftPct = ((minA - AREA_MIN) / (AREA_MAX - AREA_MIN)) * 100
   const rightPct = ((maxA - AREA_MIN) / (AREA_MAX - AREA_MIN)) * 100
@@ -255,12 +276,24 @@ export default function ProjectsCatalog() {
 
             <p className="text-sm text-slate-500">
               نمایش <span className="font-bold text-slate-700">{toFa(filtered.length)}</span> از{' '}
-              <span className="font-bold text-slate-700">۱۲۰</span> پروژه
+              <span className="font-bold text-slate-700">{toFa(allProjects.length)}</span> پروژه
             </p>
           </div>
 
           {/* گرید پروژه‌ها */}
-          {filtered.length > 0 ? (
+          {status === 'loading' ? (
+            <div className="glass flex flex-col items-center justify-center gap-3 rounded-3xl py-20 text-center">
+              <Loader2 size={36} className="animate-spin text-brand-600" />
+              <p className="text-sm font-medium text-slate-500">در حال بارگذاری پروژه‌ها...</p>
+            </div>
+          ) : status === 'error' ? (
+            <div className="glass flex flex-col items-center justify-center gap-3 rounded-3xl py-20 text-center">
+              <SearchX size={40} className="text-brand-500" />
+              <p className="text-lg font-bold text-slate-700">
+                در دریافت لیست پروژه‌ها مشکلی پیش آمد
+              </p>
+            </div>
+          ) : filtered.length > 0 ? (
             <motion.div
               layout
               className={
@@ -293,7 +326,7 @@ export default function ProjectsCatalog() {
           )}
 
           {/* صفحه بندی */}
-          {filtered.length > 0 && (
+          {status === 'ready' && filtered.length > 0 && (
             <div className="mt-12 flex flex-wrap items-center justify-center gap-2">
               <PageBtn onClick={() => setPage((p) => Math.max(1, p - 1))}>
                 <ChevronLeft size={16} />
