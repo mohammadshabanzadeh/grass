@@ -27,6 +27,7 @@ export default function ServicesHero() {
           alt="خدمات چمن مصنوعی"
           gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
           className="absolute inset-0 h-full w-full"
+          priority
         />
         {/* گرادیانت مشکی شیشه‌ای از راست به چپ */}
         <div className="absolute inset-0 bg-gradient-to-l from-black/85 from-20% via-black/45 to-transparent backdrop-blur-[1px]" />

@@ -99,6 +99,7 @@ export default function ProjectsHero() {
               alt="نمونه پروژه چمن مصنوعی اجرا شده"
               gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
               className="absolute inset-0 h-full w-full"
+              priority
             />
             <div className="absolute inset-0 bg-gradient-to-l from-transparent to-brand-100/30" />
           </motion.div>

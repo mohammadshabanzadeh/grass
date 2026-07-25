@@ -28,6 +28,7 @@ export default function AboutHero() {
               alt="چمن مصنوعی اجرا شده توسط فراز چمن"
               gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
               className="about-hero-clip absolute inset-0 h-full w-full lg:rounded-l-[2rem]"
+              priority
             />
           </div>
 

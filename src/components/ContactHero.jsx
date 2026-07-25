@@ -32,6 +32,7 @@ export default function ContactHero() {
           alt="فضای سبز فراز چمن"
           gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
           className="absolute inset-0 h-full w-full"
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-l from-white/55 via-white/10 to-transparent" />
 

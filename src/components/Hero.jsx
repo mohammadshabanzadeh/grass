@@ -21,6 +21,7 @@ export default function Hero() {
           alt="چمن مصنوعی سبز و خیره‌کننده"
           gradient="linear-gradient(120deg,#0f2417 0%,#14532d 40%,#1e3a8a 130%)"
           className="h-full w-full"
+          priority
         />
         {/* لایه‌ی تیره برای خوانایی کارت شیشه‌ای (راست‌چین) */}
         <div className="absolute inset-0 bg-gradient-to-l from-slate-900/15 via-slate-900/25 to-slate-950/55" />

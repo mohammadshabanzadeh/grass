@@ -1,3 +1,13 @@
+/* فونت وزیرمتن (نسخه‌ی متغیر) — به‌صورت محلی سرو می‌شود تا به CDN
+   خارجی وابسته نباشد و همه‌ی وزن‌ها فقط با یک فایل پوشش داده شوند. */
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-var.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

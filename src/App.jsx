@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import Navbar from './components/Navbar.jsx'
@@ -6,12 +7,15 @@ import Preloader from './components/Preloader.jsx'
 import ScrollProgress from './components/ScrollProgress.jsx'
 import BackToTop from './components/BackToTop.jsx'
 import Home from './pages/Home.jsx'
-import ProductsPage from './pages/ProductsPage.jsx'
-import ProjectsPage from './pages/ProjectsPage.jsx'
-import ProjectDetailPage from './pages/ProjectDetailPage.jsx'
-import ServicesPage from './pages/ServicesPage.jsx'
-import AboutPage from './pages/AboutPage.jsx'
-import ContactPage from './pages/ContactPage.jsx'
+
+// صفحه‌ی خانه مستقیم لود می‌شود؛ بقیه‌ی صفحات فقط هنگام نیاز
+// دانلود می‌شوند تا حجم بارگذاری اولیه کمتر شود.
+const ProductsPage = lazy(() => import('./pages/ProductsPage.jsx'))
+const ProjectsPage = lazy(() => import('./pages/ProjectsPage.jsx'))
+const ProjectDetailPage = lazy(() => import('./pages/ProjectDetailPage.jsx'))
+const ServicesPage = lazy(() => import('./pages/ServicesPage.jsx'))
+const AboutPage = lazy(() => import('./pages/AboutPage.jsx'))
+const ContactPage = lazy(() => import('./pages/ContactPage.jsx'))
 
 function AnimatedRoutes() {
   const location = useLocation()
@@ -24,15 +28,17 @@ function AnimatedRoutes() {
         exit={{ opacity: 0, y: -14 }}
         transition={{ duration: 0.35, ease: 'easeInOut' }}
       >
-        <Routes location={location}>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/projects/:id" element={<ProjectDetailPage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-        </Routes>
+        <Suspense fallback={<div className="min-h-screen" />}>
+          <Routes location={location}>
+            <Route path="/" element={<Home />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/projects/:id" element={<ProjectDetailPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+          </Routes>
+        </Suspense>
       </motion.div>
     </AnimatePresence>
   )

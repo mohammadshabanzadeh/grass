@@ -4,7 +4,14 @@ import { useState } from 'react'
  * تصویر با fallback گرادیانتی.
  * گرادیانت همیشه دیده می‌شود (حتی آفلاین) و عکس واقعی با fade روی آن ظاهر می‌شود.
  */
-export default function SmartImage({ src, alt = '', gradient, className = '', imgClassName = '' }) {
+export default function SmartImage({
+  src,
+  alt = '',
+  gradient,
+  className = '',
+  imgClassName = '',
+  priority = false, // برای تصاویر بالای صفحه (هیرو) تا زودتر لود شوند
+}) {
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
 
@@ -31,7 +38,9 @@ export default function SmartImage({ src, alt = '', gradient, className = '', im
         <img
           src={src}
           alt={alt}
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
+          fetchpriority={priority ? 'high' : undefined}
+          decoding="async"
           onLoad={() => setLoaded(true)}
           onError={() => setFailed(true)}
           className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[900ms] ${

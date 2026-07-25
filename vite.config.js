@@ -7,6 +7,18 @@ const WP_TARGET = 'https://api.farazchaman.ir/wp-json'
 export default defineConfig({
   base: '/',
   plugins: [react()],
+  build: {
+    // جدا کردن کتابخانه‌ها از کد سایت تا مرورگر بتواند آن‌ها را
+    // کش کند و با هر تغییر در سایت دوباره دانلودشان نکند.
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          motion: ['framer-motion'],
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
     open: false,
