@@ -32,7 +32,7 @@ export default function AboutHero() {
           </div>
 
           {/* متن (راست در RTL) */}
-          <div className="order-1 flex flex-col items-end justify-center gap-4 p-8 text-right sm:p-12">
+          <div className="order-1 flex flex-col items-start justify-center gap-4 p-8 text-right sm:p-12">
             <motion.h1
               variants={fadeUp}
               initial="hidden"

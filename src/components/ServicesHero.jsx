@@ -36,7 +36,7 @@ export default function ServicesHero() {
           className="pointer-events-none absolute -left-10 top-8 h-44 w-44 rounded-full bg-grass-400/25 blur-3xl"
         />
 
-        <div className="relative flex min-h-[260px] flex-col items-end justify-center gap-4 p-8 text-right text-white sm:min-h-[320px] sm:p-12">
+        <div className="relative flex min-h-[260px] flex-col items-start justify-center gap-4 p-8 text-right text-white sm:min-h-[320px] sm:p-12">
           <motion.span
             variants={fadeUp}
             initial="hidden"
