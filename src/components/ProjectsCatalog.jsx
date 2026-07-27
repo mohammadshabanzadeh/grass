@@ -10,9 +10,9 @@ import {
   RotateCcw,
   Check,
   SearchX,
-  Loader2,
 } from 'lucide-react'
 import ProjectCard from './ProjectCard.jsx'
+import SkeletonCards from './Skeleton.jsx'
 import { projectCategories, usageTypes, projectSortOptions } from '../data.js'
 import { fetchProjects } from '../lib/wp.js'
 
@@ -320,10 +320,7 @@ export default function ProjectsCatalog() {
 
           {/* گرید پروژه‌ها */}
           {status === 'loading' ? (
-            <div className="glass flex flex-col items-center justify-center gap-3 rounded-3xl py-20 text-center">
-              <Loader2 size={36} className="animate-spin text-brand-600" />
-              <p className="text-sm font-medium text-slate-500">در حال بارگذاری پروژه‌ها...</p>
-            </div>
+            <SkeletonCards count={6} view={view} imageClass="h-48" />
           ) : status === 'error' ? (
             <div className="glass flex flex-col items-center justify-center gap-3 rounded-3xl py-20 text-center">
               <SearchX size={40} className="text-brand-500" />

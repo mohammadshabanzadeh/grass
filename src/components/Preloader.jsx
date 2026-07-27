@@ -43,7 +43,10 @@ export default function Preloader() {
           key="preloader"
           exit={{ opacity: 0, scale: 1.07, filter: 'blur(6px)' }}
           transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden"
+          // pointer-events-none تا این لایه هرگز کلیک‌های منو را نگیرد؛ اگر
+          // انیمیشن خروج کامل نشود (مثلاً تب در پس‌زمینه)، وگرنه کل صفحه
+          // غیرقابل کلیک می‌ماند. اسکرول هم با overflow روی body کنترل می‌شود.
+          className="pointer-events-none fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden"
         >
           {/* تصویر چمن با زوم بسیار آرام */}
           <motion.img

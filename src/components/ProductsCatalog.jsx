@@ -13,6 +13,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import ProductCard from './ProductCard.jsx'
+import SkeletonCards from './Skeleton.jsx'
 import {
   allProducts,
   categories as staticCats,
@@ -356,7 +357,14 @@ export default function ProductsCatalog() {
           </div>
 
           {/* گرید محصولات */}
-          {filtered.length > 0 ? (
+          {loading ? (
+            <SkeletonCards
+              count={8}
+              view={view}
+              imageClass="h-44"
+              gridClass="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4"
+            />
+          ) : filtered.length > 0 ? (
             <motion.div
               layout
               className={

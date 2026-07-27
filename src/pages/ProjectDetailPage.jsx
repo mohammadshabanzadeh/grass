@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, MapPin, Maximize, Tag, Layers, Loader2, SearchX } from 'lucide-react'
+import { ArrowRight, MapPin, Maximize, Tag, Layers, SearchX } from 'lucide-react'
 import SmartImage from '../components/SmartImage.jsx'
+import { Shimmer } from '../components/Skeleton.jsx'
 import CTA from '../components/CTA.jsx'
 import { fetchProjectById } from '../lib/wp.js'
 import { projectCategories, usageTypes } from '../data.js'
@@ -41,11 +42,29 @@ export default function ProjectDetailPage() {
   }, [id])
 
   if (status === 'loading') {
+    // اسکلت هم‌شکل صفحه‌ی نهایی: هیرو، متن و ستون مشخصات
     return (
-      <section className="container-x flex min-h-[60vh] flex-col items-center justify-center gap-3 pt-28 sm:pt-32">
-        <Loader2 className="animate-spin text-brand-600" size={36} />
-        <p className="text-sm font-medium text-slate-500">در حال بارگذاری اطلاعات پروژه...</p>
-      </section>
+      <>
+        <section className="container-x pt-28 sm:pt-32">
+          <Shimmer className="mb-5 h-4 w-32 rounded-lg" />
+          <Shimmer className="min-h-[260px] rounded-[2rem] sm:min-h-[360px]" />
+        </section>
+        <section className="container-x py-12 sm:py-16">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="glass space-y-4 rounded-3xl p-6 sm:p-8">
+              {['w-full', 'w-11/12', 'w-full', 'w-9/12', 'w-10/12', 'w-2/3'].map((w, i) => (
+                <Shimmer key={i} className={`h-3.5 rounded-lg ${w}`} />
+              ))}
+            </div>
+            <div className="glass h-fit space-y-4 rounded-3xl p-6">
+              <Shimmer className="h-5 w-1/2 rounded-lg" />
+              {[0, 1, 2, 3].map((i) => (
+                <Shimmer key={i} className="h-3.5 w-full rounded-lg" />
+              ))}
+            </div>
+          </div>
+        </section>
+      </>
     )
   }
 

@@ -28,8 +28,8 @@ export default function ContactHero() {
         className="relative overflow-hidden rounded-[2rem] shadow-soft"
       >
         <SmartImage
-          src="/images/artificial-grass-05.jpg"
-          alt="فضای سبز فراز چمن"
+          src="/contact-hero-grass.jpg"
+          alt="چمن مصنوعی فراز چمن"
           gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
           className="absolute inset-0 h-full w-full"
           priority

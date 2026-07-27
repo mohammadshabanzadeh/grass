@@ -39,10 +39,15 @@ export default {
           '0%, 100%': { opacity: '1', transform: 'scale(1)' },
           '50%': { opacity: '0.4', transform: 'scale(0.85)' },
         },
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
       },
       animation: {
         float: 'float 6s ease-in-out infinite',
         'pulse-dot': 'pulse-dot 2s ease-in-out infinite',
+        shimmer: 'shimmer 1.8s ease-in-out infinite',
       },
     },
   },
