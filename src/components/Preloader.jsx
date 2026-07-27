@@ -51,6 +51,8 @@ export default function Preloader() {
           {/* تصویر چمن با زوم بسیار آرام */}
           <motion.img
             src="/images/artificial-grass-07.jpg"
+            srcSet="/images/artificial-grass-07-400.jpg 400w, /images/artificial-grass-07-800.jpg 800w, /images/artificial-grass-07.jpg 1600w"
+            sizes="100vw"
             alt=""
             initial={{ scale: 1.18 }}
             animate={{ scale: 1 }}

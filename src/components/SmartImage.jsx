@@ -11,9 +11,21 @@ export default function SmartImage({
   className = '',
   imgClassName = '',
   priority = false, // برای تصاویر بالای صفحه (هیرو) تا زودتر لود شوند
+  responsive = false, // نسخه‌های ۴۰۰ و ۸۰۰ پیکسلی هم موجود است
+  sizes = '100vw', // عرض نمایش تصویر تا مرورگر مناسب‌ترین نسخه را بگیرد
 }) {
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
+
+  // فقط برای تصاویر محلیِ هیرو که نسخه‌های کوچک‌تر برایشان ساخته شده.
+  // مرورگر بر اساس عرض واقعی نمایش، سبک‌ترین نسخه‌ی کافی را دانلود می‌کند.
+  const srcSet =
+    responsive && src?.startsWith('/') && src.endsWith('.jpg')
+      ? [400, 800]
+          .map((w) => `${src.replace(/\.jpg$/, `-${w}.jpg`)} ${w}w`)
+          .concat(`${src} 1600w`)
+          .join(', ')
+      : undefined
 
   // اگر className خودش یک کلاس موقعیت (absolute/fixed/sticky) بدهد، «relative»
   // پیش‌فرض را اضافه نمی‌کنیم چون در Tailwind هر دو روی یک المان تداخل پیدا کرده
@@ -37,6 +49,8 @@ export default function SmartImage({
       {src && !failed && (
         <img
           src={src}
+          srcSet={srcSet}
+          sizes={srcSet ? sizes : undefined}
           alt={alt}
           loading={priority ? 'eager' : 'lazy'}
           fetchpriority={priority ? 'high' : undefined}

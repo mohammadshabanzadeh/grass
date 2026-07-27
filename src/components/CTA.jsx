@@ -23,6 +23,7 @@ export default function CTA({
           alt=""
           gradient="linear-gradient(100deg,#1d4ed8 0%,#2563eb 55%,#16a34a 130%)"
           className="absolute inset-0 h-full w-full"
+          responsive
         />
         <div className="absolute inset-0 bg-gradient-to-l from-brand-700/85 to-brand-600/85" />
 

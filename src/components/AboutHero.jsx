@@ -29,6 +29,8 @@ export default function AboutHero() {
               gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
               className="about-hero-clip absolute inset-0 h-full w-full lg:rounded-l-[2rem]"
               priority
+              responsive
+              sizes="(min-width: 1024px) 50vw, 100vw"
             />
           </div>
 

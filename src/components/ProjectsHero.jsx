@@ -100,6 +100,8 @@ export default function ProjectsHero() {
               gradient="linear-gradient(120deg,#0f2417 0%,#14532d 45%,#1e3a8a 130%)"
               className="absolute inset-0 h-full w-full"
               priority
+              responsive
+              sizes="(min-width: 1024px) 50vw, 100vw"
             />
             <div className="absolute inset-0 bg-gradient-to-l from-transparent to-brand-100/30" />
           </motion.div>

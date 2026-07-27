@@ -46,6 +46,8 @@ export default function AboutStory() {
             alt="چمن مصنوعی اجرا شده"
             gradient="linear-gradient(135deg,#334155,#0f172a 70%,#16a34a)"
             className="h-full min-h-[260px] w-full rounded-3xl shadow-card"
+            responsive
+            sizes="(min-width: 1024px) 33vw, 100vw"
           />
         </motion.div>
 
