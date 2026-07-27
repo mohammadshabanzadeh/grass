@@ -2,9 +2,6 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const DURATION = 2400
-const faDigits = '۰۱۲۳۴۵۶۷۸۹'
-const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
-
 // دایره‌ی پیشرفت دور لوگو
 const R = 92
 const CIRC = 2 * Math.PI * R
@@ -153,30 +150,6 @@ export default function Preloader() {
               />
             </motion.div>
           </div>
-
-          {/* نام برند + درصد */}
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.25 }}
-            className="relative z-10 mt-4 flex flex-col items-center gap-3"
-          >
-            <p className="text-2xl font-extrabold text-brand-700 sm:text-3xl">فراز چمن</p>
-            <p className="text-xs font-medium text-slate-500 sm:text-sm">
-              فروش و نصب چمن مصنوعی
-            </p>
-
-            {/* نوار پیشرفت باریک */}
-            <div className="mt-1 h-1 w-44 overflow-hidden rounded-full bg-white/70 sm:w-56">
-              <div
-                className="h-full rounded-full bg-gradient-to-l from-brand-600 to-grass-500"
-                style={{ width: `${progress * 100}%` }}
-              />
-            </div>
-            <p className="text-xs font-bold text-brand-600">
-              {toFa(Math.round(progress * 100))}٪
-            </p>
-          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

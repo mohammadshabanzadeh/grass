@@ -83,6 +83,14 @@ export default function ProjectsCatalog() {
   const leftPct = ((minA - AREA_MIN) / (AREA_MAX - AREA_MIN)) * 100
   const rightPct = ((maxA - AREA_MIN) / (AREA_MAX - AREA_MIN)) * 100
 
+  // روی موبایل پنل فیلتر جمع است و با دکمه باز می‌شود؛ روی دسکتاپ همیشه باز است.
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const activeCount =
+    cats.length +
+    usages.length +
+    (city !== ALL_CITIES ? 1 : 0) +
+    (minA !== AREA_MIN || maxA !== AREA_MAX ? 1 : 0)
+
   return (
     <section className="container-x py-16 sm:py-20">
       <div className="grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)]">
@@ -91,15 +99,44 @@ export default function ProjectsCatalog() {
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="glass h-fit rounded-3xl p-6 lg:sticky lg:top-24"
+          className="glass h-fit rounded-3xl p-4 sm:p-6 lg:sticky lg:top-24"
         >
-          <div className="mb-2 flex items-center justify-between">
+          {/* موبایل: دکمه‌ی باز/بسته کردن پنل فیلتر */}
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((v) => !v)}
+            aria-expanded={filtersOpen}
+            aria-controls="project-filters"
+            className="flex w-full items-center justify-between gap-2 lg:hidden"
+          >
+            <span className="flex items-center gap-2">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/30">
+                <SlidersHorizontal size={18} />
+              </span>
+              {activeCount > 0 && (
+                <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-bold text-brand-700">
+                  {toFa(activeCount)}
+                </span>
+              )}
+            </span>
+            <span className="flex items-center gap-2">
+              <h3 className="text-lg font-extrabold text-slate-800">فیلتر پروژه ها</h3>
+              <ChevronDown
+                size={18}
+                className={`text-slate-500 transition ${filtersOpen ? 'rotate-180' : ''}`}
+              />
+            </span>
+          </button>
+
+          {/* دسکتاپ: فقط عنوان — فیلترها همیشه بازند */}
+          <div className="mb-2 hidden items-center justify-between lg:flex">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/30">
               <SlidersHorizontal size={18} />
             </span>
             <h3 className="text-lg font-extrabold text-slate-800">فیلتر پروژه ها</h3>
           </div>
 
+          <div id="project-filters" className={`${filtersOpen ? 'block' : 'hidden'} lg:block`}>
           {/* دسته بندی پروژه */}
           <FilterBlock title="دسته بندی پروژه">
             <ul className="space-y-3 pt-1">
@@ -220,6 +257,7 @@ export default function ProjectsCatalog() {
             <RotateCcw size={16} />
             پاک کردن فیلترها
           </button>
+          </div>
         </motion.aside>
 
         {/* ===== ناحیه پروژه‌ها (چپ) ===== */}
