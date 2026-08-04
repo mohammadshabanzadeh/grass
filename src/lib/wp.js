@@ -59,12 +59,50 @@ export async function fetchProducts() {
   }))
 }
 
-/** دسته‌بندی‌های اصلی محصولات (سطح بالا) را می‌خواند. */
+/**
+ * دسته‌بندی‌های محصولات را از ووکامرس می‌خواند و به‌صورت درختی
+ * (والد + زیرشاخه‌ها) برمی‌گرداند تا فیلتر سایت همان ساختار وردپرس را
+ * نشان دهد. دسته‌های بدون محصول کنار گذاشته می‌شوند تا فیلتر بی‌اثر نسازند.
+ */
 export async function fetchCategories() {
   const res = await apiFetch(
     `/wc/store/v1/products/categories?per_page=100&_fields=id,name,slug,parent,count`,
   )
-  return res.json()
+  const flat = await res.json()
+
+  // درخت با هر عمقی ساخته می‌شود؛ دسته‌بندی‌های این سایت سه سطح دارند
+  // (مثلاً تزئینی ← منزل ← گلخانه) و ساختِ دوسطحی نوه‌ها را جا می‌انداخت.
+  const build = (parentId) =>
+    flat
+      .filter((c) => c.parent === parentId && c.count > 0)
+      .sort((a, b) => b.count - a.count)
+      .map((c) => ({
+        id: c.id,
+        name: c.name,
+        slug: c.slug,
+        count: c.count,
+        children: build(c.id),
+      }))
+
+  return build(0)
+}
+
+/**
+ * فهرست بالای سایت را از وردپرس می‌خواند.
+ * مسیرهای پیش‌فرض وردپرس برای فهرست‌ها (wp/v2/menus) بدون ورود کاربر
+ * پاسخ ۴۰۱ می‌دهند، پس این تابع به مسیر عمومیِ افزونه‌ی «فراز چمن» وصل
+ * می‌شود. اگر افزونه نصب نباشد null برمی‌گرداند تا فهرست ثابت سایت
+ * دست‌نخورده بماند.
+ */
+export async function fetchMenu() {
+  try {
+    const res = await apiFetch('/faraz/v1/menu', { retries: 1, timeout: 6000 })
+    if (!res.ok) return null
+    const items = await res.json()
+    return Array.isArray(items) && items.length ? items : null
+  } catch {
+    return null
+  }
 }
 
 /** یک پست پروژه‌ی وردپرس را به شکل مورد نیاز کارت‌ها/صفحه‌ی اختصاصی نگاشت می‌کند. */

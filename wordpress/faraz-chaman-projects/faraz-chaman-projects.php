@@ -320,3 +320,96 @@ add_action('manage_' . FCP_POST_TYPE . '_posts_custom_column', function ($column
             break;
     }
 }, 10, 2);
+
+/* =========================================================
+ * ۶) مسیر عمومی برای خواندن فهرست (منو) سایت
+ *    مسیرهای پیش‌فرض وردپرس (wp/v2/menus) فقط برای کاربر
+ *    وارد‌شده کار می‌کنند، بنابراین یک مسیر عمومیِ فقط‌خواندنی
+ *    اضافه می‌کنیم تا سایت React بتواند فهرست را بخواند.
+ *
+ *    فهرست را در «نمایش ← فهرست‌ها» بسازید و در جایگاه
+ *    «Primary/اصلی» قرار دهید، یا نامش را «main» بگذارید.
+ * ========================================================= */
+add_action('rest_api_init', function () {
+    register_rest_route('faraz/v1', '/menu', [
+        'methods'             => 'GET',
+        'permission_callback' => '__return_true', // عمومی و فقط‌خواندنی
+        'callback'            => 'fcp_rest_menu',
+    ]);
+});
+
+function fcp_rest_menu(WP_REST_Request $request) {
+    $slug = sanitize_text_field($request->get_param('slug') ?: '');
+
+    $menu = null;
+    if ($slug) {
+        $menu = wp_get_nav_menu_object($slug);
+    }
+    if (!$menu) {
+        // اول جایگاه‌های رایج، بعد نام‌های رایج
+        $locations = get_nav_menu_locations();
+        foreach (['primary', 'main', 'header', 'menu-1'] as $loc) {
+            if (!empty($locations[$loc])) {
+                $menu = wp_get_nav_menu_object($locations[$loc]);
+                break;
+            }
+        }
+    }
+    if (!$menu && !empty($locations) && is_array($locations)) {
+        $first = array_filter($locations);
+        if ($first) {
+            $menu = wp_get_nav_menu_object(reset($first));
+        }
+    }
+    if (!$menu) {
+        foreach (['main', 'primary', 'اصلی', 'فهرست اصلی'] as $name) {
+            $menu = wp_get_nav_menu_object($name);
+            if ($menu) break;
+        }
+    }
+    if (!$menu) {
+        return new WP_REST_Response([], 200); // فهرستی تنظیم نشده است
+    }
+
+    $items = wp_get_nav_menu_items($menu->term_id);
+    if (!$items) {
+        return new WP_REST_Response([], 200);
+    }
+
+    $home = untrailingslashit(home_url());
+    $flat = [];
+    foreach ($items as $item) {
+        // آدرس را به مسیر نسبی تبدیل کن تا در دامنه‌ی سایت React کار کند
+        $url  = $item->url;
+        $path = str_replace($home, '', untrailingslashit($url));
+        if ($path === '' || $url === $home . '/') {
+            $path = '/';
+        }
+        if (!preg_match('#^https?://#', $path) && substr($path, 0, 1) !== '/' && substr($path, 0, 1) !== '#') {
+            $path = '/' . $path;
+        }
+
+        $flat[] = [
+            'id'     => (int) $item->ID,
+            'parent' => (int) $item->menu_item_parent,
+            'label'  => wp_strip_all_tags($item->title),
+            'url'    => $path,
+            'order'  => (int) $item->menu_order,
+        ];
+    }
+
+    // درختی کردن: هر آیتم، زیرمنوهای خودش را همراه دارد
+    $build = function ($parentId) use (&$build, $flat) {
+        $out = [];
+        foreach ($flat as $it) {
+            if ($it['parent'] === $parentId) {
+                $node = $it;
+                $node['children'] = $build($it['id']);
+                $out[] = $node;
+            }
+        }
+        return $out;
+    };
+
+    return new WP_REST_Response($build(0), 200);
+}

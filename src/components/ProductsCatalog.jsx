@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   SlidersHorizontal,
@@ -22,7 +23,7 @@ import {
   swatchColors,
   sortOptions,
 } from '../data.js'
-import { fetchProducts } from '../lib/wp.js'
+import { fetchProducts, fetchCategories } from '../lib/wp.js'
 
 const faDigits = '۰۱۲۳۴۵۶۷۸۹'
 const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
@@ -39,19 +40,29 @@ const FALLBACK = allProducts.map((p) => ({
   icon: p.icon,
   desc: p.desc,
   link: null,
-  cats: [(staticCats.find((c) => c.key === p.category) || {}).label].filter(Boolean),
+  catSlugs: [p.category].filter(Boolean),
   fiber: p.fiber,
   color: p.color,
   density: p.density,
   height: p.height,
 }))
 
+// دسته‌بندی‌های جایگزین، با همان شکل درختیِ داده‌ی وردپرس
+const FALLBACK_CATS = staticCats
+  .filter((c) => c.key !== 'all')
+  .map((c) => ({ id: c.key, name: c.label, slug: c.key, count: 0, children: [] }))
+
 export default function ProductsCatalog() {
   const [products, setProducts] = useState(FALLBACK)
+  const [catTree, setCatTree] = useState(FALLBACK_CATS)
   const [live, setLive] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  const [cats, setCats] = useState([])
+  // اگر از زیرمنوی «محصولات» آمده باشیم (?cat=slug) همان دسته از ابتدا فعال است
+  const [searchParams] = useSearchParams()
+  const catParam = searchParams.get('cat')
+
+  const [cats, setCats] = useState(catParam ? [catParam] : [])
   const [minH, setMinH] = useState(HEIGHT_MIN)
   const [maxH, setMaxH] = useState(HEIGHT_MAX)
   const [fibers, setFibers] = useState([])
@@ -63,25 +74,36 @@ export default function ProductsCatalog() {
   const [page, setPage] = useState(1)
   const [catOpen, setCatOpen] = useState(true)
 
+  // رفتن از یک دسته به دسته‌ی دیگر از زیرمنو، مسیر را عوض نمی‌کند و کامپوننت
+  // دوباره ساخته نمی‌شود؛ پس تغییر پارامتر آدرس باید صریح همگام شود.
+  useEffect(() => {
+    setCats(catParam ? [catParam] : [])
+  }, [catParam])
+
   useEffect(() => {
     let alive = true
-    fetchProducts()
-      .then((list) => {
-        if (!alive || !list.length) return
+    // هر دو مستقل هستند: اگر خواندن دسته‌بندی‌ها شکست بخورد محصولات
+    // همچنان نمایش داده می‌شوند و برعکس.
+    Promise.allSettled([fetchProducts(), fetchCategories()]).then(([prodRes, catRes]) => {
+      if (!alive) return
+      if (prodRes.status === 'fulfilled' && prodRes.value.length) {
         setProducts(
-          list.map((p) => ({
+          prodRes.value.map((p) => ({
             id: p.id,
             title: p.title,
             img: p.img,
             desc: p.desc,
             link: p.link,
-            cats: p.categoryNames,
+            catSlugs: p.categorySlugs,
           })),
         )
         setLive(true)
-      })
-      .catch(() => {})
-      .finally(() => alive && setLoading(false))
+      }
+      if (catRes.status === 'fulfilled' && catRes.value.length) {
+        setCatTree(catRes.value)
+      }
+      setLoading(false)
+    })
     return () => {
       alive = false
     }
@@ -99,15 +121,37 @@ export default function ProductsCatalog() {
     setDens([])
   }
 
-  // دسته‌بندی‌ها از روی محصولات واقعی ساخته می‌شوند
-  const catOptions = useMemo(() => {
-    const counts = {}
-    products.forEach((p) => (p.cats || []).forEach((c) => (counts[c] = (counts[c] || 0) + 1)))
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10)
-      .map(([name]) => name)
-  }, [products])
+  // درخت را برای نمایش به فهرستی مسطح با عمق تبدیل می‌کنیم تا هر تعداد
+  // سطح (والد/فرزند/نوه) درست تودرتو نشان داده شود.
+  const catRows = useMemo(() => {
+    const rows = []
+    const walk = (nodes, depth) =>
+      nodes.forEach((n) => {
+        rows.push({ slug: n.slug, name: n.name, count: n.count, depth })
+        walk(n.children || [], depth + 1)
+      })
+    walk(catTree, 0)
+    return rows
+  }, [catTree])
+
+  // انتخاب یک دسته باید همه‌ی زیرشاخه‌هایش (در هر عمقی) را هم شامل شود.
+  // در ووکامرس محصولات همیشه اسلاگ والد را ندارند — مثلاً تنها محصولِ
+  // «منزل» فقط اسلاگ نوه‌اش «گلخانه» را دارد — پس بدون این گسترش، فیلترِ
+  // والد صفر نتیجه می‌داد در حالی که وردپرس برایش تعداد نشان می‌دهد.
+  const expandedCats = useMemo(() => {
+    const map = {}
+    const walk = (node) => {
+      const slugs = [node.slug]
+      ;(node.children || []).forEach((child) => {
+        walk(child)
+        slugs.push(...(map[child.slug] || [child.slug]))
+      })
+      map[node.slug] = slugs
+      return slugs
+    }
+    catTree.forEach(walk)
+    return map
+  }, [catTree])
 
   const anyFiber = products.some((p) => p.fiber)
   const anyColor = products.some((p) => p.color)
@@ -115,15 +159,29 @@ export default function ProductsCatalog() {
   const anyHeight = products.some((p) => typeof p.height === 'number')
 
   const filtered = useMemo(() => {
+    const wanted = new Set(cats.flatMap((s) => expandedCats[s] || [s]))
     return products.filter((p) => {
-      const catOk = cats.length === 0 || (p.cats || []).some((c) => cats.includes(c))
+      const catOk = cats.length === 0 || (p.catSlugs || []).some((s) => wanted.has(s))
       const fiberOk = !anyFiber || fibers.length === 0 || fibers.includes(p.fiber)
       const colorOk = !anyColor || colors.length === 0 || colors.includes(p.color)
       const densOk = !anyDensity || dens.length === 0 || dens.includes(p.density)
       const hOk = !anyHeight || (p.height >= minH && p.height <= maxH)
       return catOk && fiberOk && colorOk && densOk && hOk
     })
-  }, [products, cats, fibers, colors, dens, minH, maxH, anyFiber, anyColor, anyDensity, anyHeight])
+  }, [
+    products,
+    cats,
+    expandedCats,
+    fibers,
+    colors,
+    dens,
+    minH,
+    maxH,
+    anyFiber,
+    anyColor,
+    anyDensity,
+    anyHeight,
+  ])
 
   const leftPct = ((minH - HEIGHT_MIN) / (HEIGHT_MAX - HEIGHT_MIN)) * 100
   const rightPct = ((maxH - HEIGHT_MIN) / (HEIGHT_MAX - HEIGHT_MIN)) * 100
@@ -185,13 +243,23 @@ export default function ProductsCatalog() {
           <div id="product-filters" className={`${filtersOpen ? 'block' : 'hidden'} lg:block`}>
           {/* دسته بندی */}
           <FilterBlock title="دسته بندی" collapsible open={catOpen} onToggle={() => setCatOpen((v) => !v)}>
-            <ul className="max-h-72 space-y-3 overflow-auto pt-1">
+            <ul className="max-h-80 space-y-3 overflow-auto pt-1">
               <li>
                 <CheckRow label="همه دسته بندی ها" checked={cats.length === 0} onClick={() => setCats([])} />
               </li>
-              {catOptions.map((c) => (
-                <li key={c}>
-                  <CheckRow label={c} checked={cats.includes(c)} onClick={() => toggle(setCats, cats, c)} />
+              {catRows.map((c) => (
+                <li
+                  key={c.slug}
+                  style={{ paddingInlineStart: c.depth ? c.depth * 14 : undefined }}
+                  className={c.depth ? 'border-r border-white/60' : undefined}
+                >
+                  <CheckRow
+                    label={c.name}
+                    count={c.count}
+                    small={c.depth > 0}
+                    checked={cats.includes(c.slug)}
+                    onClick={() => toggle(setCats, cats, c.slug)}
+                  />
                 </li>
               ))}
             </ul>
@@ -460,13 +528,18 @@ function FilterBlock({ title, children, collapsible = false, open = true, onTogg
   )
 }
 
-function CheckRow({ label, checked, onClick }) {
+function CheckRow({ label, checked, onClick, count, small = false }) {
   return (
     <button
       onClick={onClick}
-      className="flex w-full items-center justify-between gap-2 text-right text-sm text-slate-600 transition hover:text-brand-600"
+      className={`flex w-full items-center justify-between gap-2 text-right transition hover:text-brand-600 ${
+        small ? 'text-[13px] text-slate-500' : 'text-sm text-slate-600'
+      }`}
     >
-      <span>{label}</span>
+      <span>
+        {label}
+        {count > 0 && <span className="mr-1.5 text-xs text-slate-400">({toFa(count)})</span>}
+      </span>
       <span
         className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition ${
           checked ? 'border-brand-600 bg-brand-600 text-white' : 'border-slate-300 bg-white/60'
