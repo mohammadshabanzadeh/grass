@@ -9,3 +9,4 @@ npm-debug.log*
 install.log
 .vscode
 .idea
+wordpress/*.zip
