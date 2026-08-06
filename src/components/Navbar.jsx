@@ -1,24 +1,34 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, Menu, X, ChevronDown } from 'lucide-react'
+import { Phone, Menu, X, ChevronDown, ChevronLeft } from 'lucide-react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import Logo from './Logo.jsx'
 import { navLinks } from '../data.js'
 import { fetchMenu, fetchCategories } from '../lib/wp.js'
 
-// فهرست ثابت سایت به شکل یکسان با داده‌ی وردپرس درمی‌آید تا هر دو منبع
-// با یک کد رندر شوند.
+// فهرست ثابت سایت به همان شکل داده‌ی وردپرس درمی‌آید تا هر دو منبع با یک
+// کد رندر شوند.
 const STATIC_MENU = navLinks.map((l) => ({
+  id: l.to,
   label: l.label,
   to: l.type === 'route' ? l.to : `#${l.id}`,
   children: [],
 }))
 
+/** درخت دسته‌بندی ووکامرس را به شکل آیتم‌های منو (با هر عمقی) درمی‌آورد. */
+const catsToMenu = (nodes) =>
+  nodes.map((c) => ({
+    id: `cat-${c.id}`,
+    label: c.name,
+    to: c.href, // مسیر تودرتوی تمیز: /products/<parent>/<child>/...
+    children: catsToMenu(c.children || []),
+  }))
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState(STATIC_MENU)
-  const [openSub, setOpenSub] = useState(null) // زیرمنوی بازشده در موبایل
+  const [openIds, setOpenIds] = useState([]) // زیرمنوهای بازِ موبایل
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -35,27 +45,16 @@ export default function Navbar() {
       if (!alive) return
 
       const wpMenu = menuRes.status === 'fulfilled' ? menuRes.value : null
-      let next = wpMenu
-        ? wpMenu.map((m) => ({
-            label: m.label,
-            to: m.url,
-            children: (m.children || []).map((c) => ({ label: c.label, to: c.url })),
-          }))
-        : STATIC_MENU
+      let next = wpMenu || STATIC_MENU
 
-      // دسته‌بندی‌های واقعی ووکامرس را به‌عنوان زیرمنوی «محصولات» می‌گذاریم
-      // (اگر فهرست وردپرس خودش زیرمنو نداشته باشد).
+      // دسته‌بندی‌های واقعی ووکامرس زیرمنوی «محصولات» می‌شوند (اگر خود فهرست
+      // وردپرس برای آن زیرمنویی نداشته باشد).
       const cats = catRes.status === 'fulfilled' ? catRes.value : []
       if (cats.length) {
+        const subs = catsToMenu(cats)
         next = next.map((it) =>
-          it.to === '/products' && it.children.length === 0
-            ? {
-                ...it,
-                children: cats.map((c) => ({
-                  label: c.name,
-                  to: `/products?cat=${encodeURIComponent(c.slug)}`,
-                })),
-              }
+          it.to === '/products' && (!it.children || it.children.length === 0)
+            ? { ...it, children: subs }
             : it,
         )
       }
@@ -66,6 +65,12 @@ export default function Navbar() {
     }
   }, [])
 
+  // با هر جابجایی صفحه، منوی موبایل بسته می‌شود
+  useEffect(() => {
+    setOpen(false)
+    setOpenIds([])
+  }, [location.pathname])
+
   const scrollToId = (id) => {
     const el = document.getElementById(id)
     if (el) el.scrollIntoView({ behavior: 'smooth' })
@@ -73,10 +78,9 @@ export default function Navbar() {
 
   const go = (e, to) => {
     e.preventDefault()
-    setOpen(false)
-    setOpenSub(null)
     if (to.startsWith('#')) {
       const id = to.slice(1)
+      setOpen(false)
       if (location.pathname !== '/') {
         navigate('/')
         setTimeout(() => scrollToId(id), 350)
@@ -89,7 +93,14 @@ export default function Navbar() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const isActive = (to) => !to.startsWith('#') && location.pathname === to.split('?')[0]
+  const isActive = (to) => {
+    if (to.startsWith('#')) return false
+    if (to === '/') return location.pathname === '/'
+    return location.pathname === to || location.pathname.startsWith(to + '/')
+  }
+
+  const toggleId = (id) =>
+    setOpenIds((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4">
@@ -101,7 +112,6 @@ export default function Navbar() {
           scrolled ? 'glass-strong' : 'glass'
         }`}
       >
-        {/* لوگو (راست در RTL) */}
         <Link
           to="/"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -110,10 +120,10 @@ export default function Navbar() {
           <Logo />
         </Link>
 
-        {/* منوی دسکتاپ */}
+        {/* ===== منوی دسکتاپ ===== */}
         <ul className="hidden items-center gap-7 lg:flex xl:gap-8">
           {items.map((link) => (
-            <li key={link.label} className="group relative">
+            <li key={link.id ?? link.label} className="group relative">
               <a
                 href={link.to}
                 onClick={(e) => go(e, link.to)}
@@ -122,7 +132,7 @@ export default function Navbar() {
                 }`}
               >
                 {link.label}
-                {link.children.length > 0 && (
+                {link.children?.length > 0 && (
                   <ChevronDown size={15} className="mt-0.5 transition group-hover:rotate-180" />
                 )}
               </a>
@@ -132,29 +142,15 @@ export default function Navbar() {
                 }`}
               />
 
-              {/* زیرمنوی دسکتاپ (با هاور) */}
-              {link.children.length > 0 && (
+              {link.children?.length > 0 && (
                 <div className="invisible absolute right-0 top-full z-40 pt-4 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
-                  <ul className="glass-strong max-h-[70vh] w-64 overflow-auto rounded-2xl p-2 shadow-soft">
-                    {link.children.map((sub) => (
-                      <li key={sub.to}>
-                        <a
-                          href={sub.to}
-                          onClick={(e) => go(e, sub.to)}
-                          className="block rounded-xl px-3 py-2 text-right text-[13px] font-semibold text-slate-700 transition hover:bg-white/70 hover:text-brand-700"
-                        >
-                          {sub.label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
+                  <DesktopSubmenu items={link.children} onNavigate={go} isActive={isActive} />
                 </div>
               )}
             </li>
           ))}
         </ul>
 
-        {/* دکمه مشاوره (چپ در RTL) */}
         <a
           href="#contact"
           onClick={(e) => go(e, '#contact')}
@@ -164,7 +160,6 @@ export default function Navbar() {
           مشاوره رایگان
         </a>
 
-        {/* همبرگر موبایل */}
         <button
           onClick={() => setOpen((v) => !v)}
           className="glass flex h-11 w-11 items-center justify-center rounded-xl text-brand-700 lg:hidden"
@@ -174,7 +169,7 @@ export default function Navbar() {
         </button>
       </motion.nav>
 
-      {/* منوی موبایل */}
+      {/* ===== منوی موبایل ===== */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -186,56 +181,15 @@ export default function Navbar() {
           >
             <ul className="flex flex-col divide-y divide-white/40">
               {items.map((link) => (
-                <li key={link.label}>
-                  <div className="flex items-center justify-between">
-                    <a
-                      href={link.to}
-                      onClick={(e) => go(e, link.to)}
-                      className={`flex-1 py-3 text-right text-sm font-bold hover:text-brand-700 ${
-                        isActive(link.to) ? 'text-brand-700' : 'text-slate-800'
-                      }`}
-                    >
-                      {link.label}
-                    </a>
-                    {link.children.length > 0 && (
-                      <button
-                        onClick={() => setOpenSub((s) => (s === link.label ? null : link.label))}
-                        aria-label={`زیرمنوی ${link.label}`}
-                        aria-expanded={openSub === link.label}
-                        className="p-2 text-slate-500"
-                      >
-                        <ChevronDown
-                          size={16}
-                          className={`transition ${openSub === link.label ? 'rotate-180' : ''}`}
-                        />
-                      </button>
-                    )}
-                  </div>
-
-                  <AnimatePresence initial={false}>
-                    {link.children.length > 0 && openSub === link.label && (
-                      <motion.ul
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.22 }}
-                        className="overflow-hidden pb-2"
-                      >
-                        {link.children.map((sub) => (
-                          <li key={sub.to}>
-                            <a
-                              href={sub.to}
-                              onClick={(e) => go(e, sub.to)}
-                              className="block py-2 pr-4 text-right text-[13px] font-medium text-slate-600 hover:text-brand-700"
-                            >
-                              {sub.label}
-                            </a>
-                          </li>
-                        ))}
-                      </motion.ul>
-                    )}
-                  </AnimatePresence>
-                </li>
+                <MobileNode
+                  key={link.id ?? link.label}
+                  node={link}
+                  depth={0}
+                  openIds={openIds}
+                  toggleId={toggleId}
+                  onNavigate={go}
+                  isActive={isActive}
+                />
               ))}
             </ul>
             <a
@@ -250,5 +204,91 @@ export default function Navbar() {
         )}
       </AnimatePresence>
     </header>
+  )
+}
+
+/** پنل زیرمنوی دسکتاپ؛ سطح‌های بعدی با هاور از سمت چپ باز می‌شوند (RTL). */
+function DesktopSubmenu({ items, onNavigate, isActive }) {
+  return (
+    <ul className="glass-strong max-h-[70vh] w-64 overflow-visible rounded-2xl p-2 shadow-soft">
+      {items.map((node) => (
+        <li key={node.id ?? node.label} className="group/sub relative">
+          <a
+            href={node.to}
+            onClick={(e) => onNavigate(e, node.to)}
+            className={`flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-right text-[13px] font-semibold transition hover:bg-white/70 hover:text-brand-700 ${
+              isActive(node.to) ? 'text-brand-700' : 'text-slate-700'
+            }`}
+          >
+            <span>{node.label}</span>
+            {node.children?.length > 0 && <ChevronLeft size={14} className="shrink-0 opacity-60" />}
+          </a>
+
+          {node.children?.length > 0 && (
+            <div className="invisible absolute right-full top-0 z-50 pl-2 pr-1 opacity-0 transition-all duration-200 group-hover/sub:visible group-hover/sub:opacity-100">
+              <DesktopSubmenu items={node.children} onNavigate={onNavigate} isActive={isActive} />
+            </div>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/** آیتم منوی موبایل — بازگشتی، پس هر تعداد سطح را پشتیبانی می‌کند. */
+function MobileNode({ node, depth, openIds, toggleId, onNavigate, isActive }) {
+  const id = node.id ?? node.label
+  const hasKids = node.children?.length > 0
+  const expanded = openIds.includes(id)
+
+  return (
+    <li className={depth > 0 ? 'border-none' : undefined}>
+      <div className="flex items-center justify-between">
+        <a
+          href={node.to}
+          onClick={(e) => onNavigate(e, node.to)}
+          style={{ paddingInlineStart: depth ? depth * 12 : undefined }}
+          className={`flex-1 py-3 text-right hover:text-brand-700 ${
+            depth === 0 ? 'text-sm font-bold' : 'text-[13px] font-medium'
+          } ${isActive(node.to) ? 'text-brand-700' : depth === 0 ? 'text-slate-800' : 'text-slate-600'}`}
+        >
+          {node.label}
+        </a>
+        {hasKids && (
+          <button
+            onClick={() => toggleId(id)}
+            aria-label={`زیرمنوی ${node.label}`}
+            aria-expanded={expanded}
+            className="p-2 text-slate-500"
+          >
+            <ChevronDown size={16} className={`transition ${expanded ? 'rotate-180' : ''}`} />
+          </button>
+        )}
+      </div>
+
+      <AnimatePresence initial={false}>
+        {hasKids && expanded && (
+          <motion.ul
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            className="overflow-hidden border-r border-white/50 pb-1"
+          >
+            {node.children.map((child) => (
+              <MobileNode
+                key={child.id ?? child.label}
+                node={child}
+                depth={depth + 1}
+                openIds={openIds}
+                toggleId={toggleId}
+                onNavigate={onNavigate}
+                isActive={isActive}
+              />
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </li>
   )
 }

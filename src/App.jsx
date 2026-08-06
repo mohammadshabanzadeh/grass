@@ -16,6 +16,7 @@ const ProjectDetailPage = lazy(() => import('./pages/ProjectDetailPage.jsx'))
 const ServicesPage = lazy(() => import('./pages/ServicesPage.jsx'))
 const AboutPage = lazy(() => import('./pages/AboutPage.jsx'))
 const ContactPage = lazy(() => import('./pages/ContactPage.jsx'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'))
 
 function AnimatedRoutes() {
   const location = useLocation()
@@ -23,9 +24,15 @@ function AnimatedRoutes() {
   // فقط محو می‌شود. با mode="wait" تعویض محتوا به پایان انیمیشن خروج گره
   // می‌خورد و اگر آن انیمیشن به هر دلیلی کامل نشود، کاربر روی صفحه‌ی قبلی
   // گیر می‌کرد در حالی که آدرس عوض شده بود.
+  //
+  // کلید فقط با عوض شدن «بخش» سایت تغییر می‌کند، نه با هر آدرس. اگر کلید
+  // برابر کل مسیر باشد، رفتن از یک دسته‌بندی به دسته‌بندی دیگر کل صفحه را
+  // از نو می‌سازد و داده‌ها هر بار دوباره از وردپرس گرفته می‌شوند.
+  const section = location.pathname.split('/')[1] || 'home'
+
   return (
     <motion.div
-      key={location.pathname}
+      key={section}
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: 'easeInOut' }}
@@ -33,12 +40,19 @@ function AnimatedRoutes() {
       <Suspense fallback={<div className="min-h-screen" />}>
         <Routes location={location}>
           <Route path="/" element={<Home />} />
-          <Route path="/products" element={<ProductsPage />} />
+          {/* یک مسیر برای هر دو حالت «/products» و دسته‌بندی‌های تودرتو
+              «/products/decorative-artificial-grass/residential/patio».
+              اگر این دو، دو Route جدا باشند، جابجایی بینشان کامپوننت را
+              از نو می‌سازد و هر بار داده‌ها دوباره از وردپرس گرفته می‌شوند. */}
+          <Route path="/products/*" element={<ProductsPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:id" element={<ProjectDetailPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          {/* هر آدرس ناشناخته (مثلاً آیتمی از فهرست وردپرس که هنوز صفحه‌ای
+              برایش ساخته نشده) به‌جای صفحه‌ی سفید، این صفحه را می‌بیند. */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </motion.div>

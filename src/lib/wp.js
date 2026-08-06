@@ -60,31 +60,57 @@ export async function fetchProducts() {
 }
 
 /**
- * دسته‌بندی‌های محصولات را از ووکامرس می‌خواند و به‌صورت درختی
- * (والد + زیرشاخه‌ها) برمی‌گرداند تا فیلتر سایت همان ساختار وردپرس را
- * نشان دهد. دسته‌های بدون محصول کنار گذاشته می‌شوند تا فیلتر بی‌اثر نسازند.
+ * فهرست تخت وردپرس (هر آیتم با id و parent) را به درخت تبدیل می‌کند.
+ * عمق محدود نیست؛ دسته‌بندی‌های این سایت سه سطح دارند
+ * (مثلاً تزئینی ← منزل ← گلخانه).
+ */
+function buildTree(flat, { keep = () => true, sort, mapNode } = {}) {
+  const build = (parentId, trail) => {
+    const rows = flat.filter((c) => Number(c.parent) === parentId && keep(c))
+    if (sort) rows.sort(sort)
+    return rows.map((c) => {
+      const path = [...trail, c.slug]
+      return {
+        ...mapNode(c),
+        // مسیر کامل از ریشه تا این گره — برای ساختن آدرس تمیز
+        path,
+        href: '/products/' + path.join('/'),
+        children: build(Number(c.id), path),
+      }
+    })
+  }
+  return build(0, [])
+}
+
+/**
+ * دسته‌بندی‌های محصولات را درختی برمی‌گرداند.
+ * مسیر اختصاصی سایت (faraz/v1) هم سریع‌تر است و هم کل درخت را می‌دهد؛
+ * اگر در دسترس نبود به Store API ووکامرس برمی‌گردیم.
+ * دسته‌های بدون محصول کنار گذاشته می‌شوند تا لینک و فیلترِ بی‌نتیجه نسازند.
  */
 export async function fetchCategories() {
-  const res = await apiFetch(
-    `/wc/store/v1/products/categories?per_page=100&_fields=id,name,slug,parent,count`,
-  )
-  const flat = await res.json()
+  let flat
+  try {
+    const res = await apiFetch('/faraz/v1/product-categories', { retries: 1 })
+    flat = await res.json()
+  } catch {
+    const res = await apiFetch(
+      `/wc/store/v1/products/categories?per_page=100&_fields=id,name,slug,parent,count`,
+    )
+    flat = await res.json()
+  }
+  if (!Array.isArray(flat)) return []
 
-  // درخت با هر عمقی ساخته می‌شود؛ دسته‌بندی‌های این سایت سه سطح دارند
-  // (مثلاً تزئینی ← منزل ← گلخانه) و ساختِ دوسطحی نوه‌ها را جا می‌انداخت.
-  const build = (parentId) =>
-    flat
-      .filter((c) => c.parent === parentId && c.count > 0)
-      .sort((a, b) => b.count - a.count)
-      .map((c) => ({
-        id: c.id,
-        name: c.name,
-        slug: c.slug,
-        count: c.count,
-        children: build(c.id),
-      }))
-
-  return build(0)
+  return buildTree(flat, {
+    keep: (c) => Number(c.count) > 0,
+    sort: (a, b) => Number(b.count) - Number(a.count),
+    mapNode: (c) => ({
+      id: Number(c.id),
+      name: c.name,
+      slug: c.slug,
+      count: Number(c.count) || 0,
+    }),
+  })
 }
 
 /**
@@ -96,10 +122,29 @@ export async function fetchCategories() {
  */
 export async function fetchMenu() {
   try {
-    const res = await apiFetch('/faraz/v1/menu', { retries: 1, timeout: 6000 })
+    // مهلت کوتاه اینجا خطرناک است: اگر منقضی شود کاربر فهرست ثابتِ متفاوتی
+    // می‌بیند. سرور وردپرس گاهی چند ثانیه طول می‌کشد، پس مهلت پیش‌فرض
+    // (۱۰ ثانیه با دو تلاش مجدد) را نگه می‌داریم.
+    const res = await apiFetch('/faraz/v1/site-menu')
     if (!res.ok) return null
-    const items = await res.json()
-    return Array.isArray(items) && items.length ? items : null
+    const flat = await res.json()
+    if (!Array.isArray(flat) || !flat.length) return null
+
+    // پاسخ تخت است (id/parent)؛ به درخت با هر عمقی تبدیلش می‌کنیم تا
+    // زیرمنوها و زیرِ زیرمنوها هم نمایش داده شوند.
+    const build = (parentId) =>
+      flat
+        .filter((m) => Number(m.parent) === parentId)
+        .sort((a, b) => Number(a.order) - Number(b.order))
+        .map((m) => ({
+          id: Number(m.id),
+          label: m.label,
+          to: m.url || '/',
+          children: build(Number(m.id)),
+        }))
+
+    const tree = build(0)
+    return tree.length ? tree : null
   } catch {
     return null
   }

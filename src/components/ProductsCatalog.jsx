@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   SlidersHorizontal,
@@ -58,9 +58,14 @@ export default function ProductsCatalog() {
   const [live, setLive] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  // اگر از زیرمنوی «محصولات» آمده باشیم (?cat=slug) همان دسته از ابتدا فعال است
-  const [searchParams] = useSearchParams()
-  const catParam = searchParams.get('cat')
+  // دسته از خودِ مسیر خوانده می‌شود، بدون پارامتر در آدرس:
+  // /products/decorative-artificial-grass/residential/patio → «گلخانه»
+  // آخرین بخشِ مسیر همان دسته‌ی انتخاب‌شده است.
+  const params = useParams()
+  const catParam = (params['*'] || '')
+    .split('/')
+    .filter(Boolean)
+    .pop()
 
   const [cats, setCats] = useState(catParam ? [catParam] : [])
   const [minH, setMinH] = useState(HEIGHT_MIN)
@@ -417,10 +422,19 @@ export default function ProductsCatalog() {
               </div>
             </div>
 
+            {/* تا وقتی داده‌ی واقعی نرسیده، شمارشِ داده‌ی جایگزین گمراه‌کننده است */}
             <p className="flex items-center gap-1.5 text-sm text-slate-600">
-              {loading && <Loader2 size={15} className="animate-spin text-brand-500" />}
-              نمایش <span className="font-bold text-slate-800">{toFa(filtered.length)}</span> از{' '}
-              <span className="font-bold text-slate-800">{toFa(products.length)}</span> محصول
+              {loading ? (
+                <>
+                  <Loader2 size={15} className="animate-spin text-brand-500" />
+                  در حال دریافت محصولات…
+                </>
+              ) : (
+                <>
+                  نمایش <span className="font-bold text-slate-800">{toFa(filtered.length)}</span> از{' '}
+                  <span className="font-bold text-slate-800">{toFa(products.length)}</span> محصول
+                </>
+              )}
             </p>
           </div>
 
