@@ -48,6 +48,9 @@ export default function ContactForm() {
               <input
                 name={f.name}
                 type={f.type}
+                // مرورگر برای ورودی tel جهت را ltr می‌گذارد و در نتیجه
+                // placeholder فارسی چپ‌چین می‌شود؛ صریح راست‌چین می‌کنیم.
+                dir="rtl"
                 required={f.name !== 'email'}
                 value={values[f.name]}
                 onChange={onChange}

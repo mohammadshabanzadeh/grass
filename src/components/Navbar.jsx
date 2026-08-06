@@ -210,7 +210,7 @@ export default function Navbar() {
 /** پنل زیرمنوی دسکتاپ؛ سطح‌های بعدی با هاور از سمت چپ باز می‌شوند (RTL). */
 function DesktopSubmenu({ items, onNavigate, isActive }) {
   return (
-    <ul className="glass-strong max-h-[70vh] w-64 overflow-visible rounded-2xl p-2 shadow-soft">
+    <ul className="glass-menu max-h-[70vh] w-64 overflow-visible rounded-2xl p-2">
       {items.map((node) => (
         <li key={node.id ?? node.label} className="group/sub relative">
           <a

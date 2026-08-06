@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, Phone } from 'lucide-react'
+import { ArrowLeft, Phone, Trophy } from 'lucide-react'
 import SmartImage from './SmartImage.jsx'
 
 const fadeUp = {
@@ -54,18 +54,34 @@ export default function Hero() {
               initial="hidden"
               animate="show"
               custom={1}
-              className="text-4xl font-extrabold leading-[1.25] text-slate-800 sm:text-5xl"
+              className="text-3xl font-extrabold leading-[1.3] text-slate-800 sm:text-[2.75rem] sm:leading-[1.25]"
             >
-              فروش و نصب
+              مرجع تخصصی اجرای
               <br />
-              <span className="text-brand-600">چمن مصنوعی</span>
+              <span className="text-brand-600">چمن مصنوعی</span> در ایران
             </motion.h2>
+
+            {/* کادر ویژه‌ی استاندارد فیفا */}
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="show"
+              custom={2}
+              className="mt-5 inline-flex items-center gap-3 rounded-2xl border border-grass-400/40 bg-gradient-to-l from-grass-500/15 to-brand-500/10 px-5 py-3.5 shadow-sm"
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-grass-500 text-white shadow-md shadow-grass-500/30">
+                <Trophy size={20} />
+              </span>
+              <span className="text-sm font-extrabold leading-7 text-slate-800 sm:text-base">
+                زمین‌های فوتبال با استانداردهای فیفا
+              </span>
+            </motion.div>
 
             <motion.p
               variants={fadeUp}
               initial="hidden"
               animate="show"
-              custom={2}
+              custom={3}
               className="mt-5 max-w-lg text-sm leading-8 text-slate-600 sm:text-base"
             >
               با استفاده از بهترین متریال و جدیدترین تکنولوژی، فضایی سبز و دلنشین
@@ -76,7 +92,7 @@ export default function Hero() {
               variants={fadeUp}
               initial="hidden"
               animate="show"
-              custom={3}
+              custom={4}
               className="mt-8 flex flex-col gap-3 sm:flex-row"
             >
               <a
