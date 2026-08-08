@@ -17,7 +17,7 @@ import {
 import ProductCard from './ProductCard.jsx'
 import SkeletonCards from './Skeleton.jsx'
 import { allProducts, categories as staticCats, sortOptions } from '../data.js'
-import { fetchProducts, fetchCategories } from '../lib/wp.js'
+import { fetchProducts, fetchCategories, fetchProductAttributes } from '../lib/wp.js'
 import { buildAttrGroups, buildCatExpansion, filterProducts } from '../lib/productFilters.js'
 
 const faDigits = '۰۱۲۳۴۵۶۷۸۹'
@@ -110,7 +110,21 @@ export default function ProductsCatalog() {
         setCatTree(catRes.value)
       }
       setLoading(false)
+
+      // ویژگی‌ها «بعد از» رسیدن محصولات گرفته می‌شوند، نه هم‌زمان: سرور
+      // وردپرس کند است و درخواست‌های موازی همدیگر را عقب می‌اندازند. این
+      // درخواست نمایش محصولات را مسدود نمی‌کند و فیلترهایش به‌محض رسیدن
+      // اضافه می‌شوند.
+      fetchProductAttributes()
+        .then((map) => {
+          if (!alive || !map.size) return
+          setProducts((prev) =>
+            prev.map((p) => (map.has(p.id) ? { ...p, attributes: map.get(p.id) } : p)),
+          )
+        })
+        .catch(() => {})
     })
+
     return () => {
       alive = false
     }

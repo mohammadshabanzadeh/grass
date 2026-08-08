@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const DURATION = 2400
+// حداقل زمانِ ماندن روی صفحه، فقط برای اینکه لوگو پرش‌کنان ظاهر و ناپدید
+// نشود. قبلاً این عدد ۲۴۰۰ بود و به هر بار باز کردن سایت حدود ۲.۵ ثانیه
+// تأخیرِ ساختگی اضافه می‌کرد.
+const MIN_VISIBLE = 550
+// سقف انتظار برای آماده‌شدن صفحه، تا لودینگ هیچ‌وقت گیر نکند
+const MAX_VISIBLE = 2500
 // دایره‌ی پیشرفت دور لوگو
 const R = 92
 const CIRC = 2 * Math.PI * R
@@ -14,21 +19,36 @@ export default function Preloader() {
     document.body.style.overflow = 'hidden'
     const start = performance.now()
     let raf
+    let done = false
+
+    const finish = () => {
+      if (done) return
+      done = true
+      setProgress(1)
+      // حداقل زمان را رعایت کن تا نمایش لوگو پرشی نباشد
+      const left = Math.max(0, MIN_VISIBLE - (performance.now() - start))
+      setTimeout(() => setVisible(false), left)
+    }
+
+    // به‌جای شمارش تا یک عددِ ثابت، تا «آماده شدن صفحه» پیش می‌رویم
     const tick = (now) => {
-      const t = Math.min(1, (now - start) / DURATION)
-      setProgress(1 - Math.pow(1 - t, 3)) // ease-out برای حرکت نرم‌تر
-      if (t < 1) raf = requestAnimationFrame(tick)
-      else setVisible(false)
+      const t = Math.min(0.9, (now - start) / MAX_VISIBLE)
+      setProgress(1 - Math.pow(1 - t, 3))
+      if (!done) raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
 
-    // تضمین بسته‌شدن لودینگ: اگر صفحه در تبِ پس‌زمینه باز شود مرورگر
-    // requestAnimationFrame را متوقف می‌کند و لودینگ برای همیشه باقی می‌ماند.
-    const failsafe = setTimeout(() => setVisible(false), DURATION + 400)
+    if (document.readyState === 'complete') finish()
+    else window.addEventListener('load', finish, { once: true })
+
+    // تضمین بسته‌شدن: اگر صفحه در تبِ پس‌زمینه باز شود مرورگر
+    // requestAnimationFrame و رویداد load را به تعویق می‌اندازد.
+    const failsafe = setTimeout(finish, MAX_VISIBLE)
 
     return () => {
       cancelAnimationFrame(raf)
       clearTimeout(failsafe)
+      window.removeEventListener('load', finish)
     }
   }, [])
 

@@ -17,7 +17,7 @@ function stripHtml(html = '') {
  * به کاربر پیام خطا نشان دهد. هر درخواست با مهلت زمانی و چند بار تلاش
  * مجدد (با فاصله‌ی فزاینده) انجام می‌شود.
  */
-async function apiFetch(path, { retries = 2, timeout = 10000 } = {}) {
+async function apiFetch(path, { retries = 1, timeout = 20000 } = {}) {
   let lastError
   for (let attempt = 0; attempt <= retries; attempt++) {
     const controller = new AbortController()
@@ -57,6 +57,34 @@ const once = (key, fn) => {
   return cache.get(key)
 }
 
+/**
+ * کش نشست (sessionStorage): سرور وردپرس چند ثانیه طول می‌کشد، پس در
+ * بازدیدهای بعدی همان داده فوراً از حافظه‌ی مرورگر خوانده می‌شود و
+ * هم‌زمان در پس‌زمینه تازه می‌شود (stale-while-revalidate).
+ */
+const SS_KEY = 'fc:catalog:v1'
+const SS_TTL = 10 * 60 * 1000 // ۱۰ دقیقه
+
+function readSession() {
+  try {
+    const raw = sessionStorage.getItem(SS_KEY)
+    if (!raw) return null
+    const { at, data } = JSON.parse(raw)
+    if (!at || Date.now() - at > SS_TTL) return null
+    return data
+  } catch {
+    return null
+  }
+}
+
+function writeSession(data) {
+  try {
+    sessionStorage.setItem(SS_KEY, JSON.stringify({ at: Date.now(), data }))
+  } catch {
+    // حجم پر یا حالت خصوصی مرورگر — کش نداشتن مشکلی ایجاد نمی‌کند
+  }
+}
+
 /** یک محصول ووکامرس را به شکل مورد نیاز کارت‌ها و صفحه‌ی محصول درمی‌آورد. */
 function mapProduct(p) {
   return {
@@ -93,12 +121,96 @@ function mapProduct(p) {
 const PRODUCT_FIELDS =
   'id,name,slug,permalink,sku,short_description,description,images,categories,attributes,prices,is_in_stock'
 
-/** محصولات ووکامرس را می‌خواند و به شکل مورد نیاز کارت‌ها نگاشت می‌کند. */
+/** محصولات، دسته‌بندی‌ها و فهرست را از سه مسیر جدا می‌گیرد (حالت پشتیبان). */
+async function loadSeparately() {
+  // بدون تلاش مجدد: این مسیر فقط وقتی اجرا می‌شود که catalog از کار افتاده
+  // باشد؛ تلاش دوباره روی سرورِ از قبل کند، اوضاع را بدتر می‌کند.
+  const opts = { retries: 0 }
+  const [prod, cats, menu] = await Promise.all([
+    apiFetch(`/wc/store/v1/products?per_page=100&_fields=${PRODUCT_FIELDS}`, opts).then((r) =>
+      r.json(),
+    ),
+    apiFetch(`/wc/store/v1/products/categories?per_page=100&_fields=id,name,slug,parent,count`, opts)
+      .then((r) => r.json())
+      .catch(() => []),
+    apiFetch('/faraz/v1/site-menu', opts)
+      .then((r) => r.json())
+      .catch(() => []),
+  ])
+  return { products: prod, categories: cats, menu }
+}
+
+/**
+ * همه‌ی داده‌های سایت با «یک» درخواست.
+ *
+ * سرور وردپرس کند است (اندازه‌گیری‌شده ۲ تا ۱۱ ثانیه برای هر درخواست)، پس
+ * سه درخواست جدا برای فهرست، دسته‌بندی و محصولات یعنی صبر کردن تا کندترینِ
+ * آن‌ها. مسیر faraz/v1/catalog هر سه را یک‌جا و به‌طور پایدار در ~۲.۵ ثانیه
+ * برمی‌گرداند. نتیجه در sessionStorage می‌ماند تا بارگذاری‌های بعدی فوری
+ * باشند و داده در پس‌زمینه تازه شود.
+ */
+export function fetchCatalog() {
+  return once('catalog', async () => {
+    const cached = readSession()
+    if (cached) {
+      // تازه‌سازی در پس‌زمینه؛ نتیجه‌اش برای بارگذاری بعدی استفاده می‌شود
+      loadCatalogFresh().catch(() => {})
+      return cached
+    }
+    return loadCatalogFresh()
+  })
+}
+
+async function loadCatalogFresh() {
+  let data
+  try {
+    const res = await apiFetch('/faraz/v1/catalog', { retries: 1 })
+    const json = await res.json()
+    if (!json || !Array.isArray(json.products)) throw new Error('bad catalog shape')
+    data = {
+      products: json.products,
+      categories: json.categories || [],
+      menu: json.menu || [],
+    }
+  } catch {
+    data = await loadSeparately()
+  }
+  writeSession(data)
+  return data
+}
+
+/** محصولات را به شکل مورد نیاز کارت‌ها نگاشت می‌کند. */
 export function fetchProducts() {
   return once('products', async () => {
-    const res = await apiFetch(`/wc/store/v1/products?per_page=100&_fields=${PRODUCT_FIELDS}`)
-    const data = await res.json()
-    return data.map(mapProduct)
+    const { products } = await fetchCatalog()
+    return products.map(mapProduct)
+  })
+}
+
+/**
+ * ویژگی‌های محصولات (رنگ، جنس، اندازه) را جداگانه می‌گیرد.
+ * مسیر catalog ویژگی‌ها را برنمی‌گرداند، پس فقط صفحه‌ی محصولات — که به
+ * فیلترها نیاز دارد — این درخواست را می‌زند و بقیه‌ی صفحات هزینه‌اش را
+ * نمی‌دهند. اگر شکست بخورد، فقط فیلترهای ویژگی نمایش داده نمی‌شوند.
+ */
+export function fetchProductAttributes() {
+  return once('attributes', async () => {
+    // بدون تلاش مجدد: این درخواست اختیاری است و نباید به سرورِ کند فشار بیاورد
+    const res = await apiFetch(`/wc/store/v1/products?per_page=100&_fields=id,attributes`, {
+      retries: 0,
+    })
+    const rows = await res.json()
+    const map = new Map()
+    rows.forEach((p) =>
+      map.set(
+        p.id,
+        (p.attributes || []).map((a) => ({
+          name: a.name,
+          values: (a.terms || []).map((t) => t.name),
+        })),
+      ),
+    )
+    return map
   })
 }
 
@@ -157,16 +269,7 @@ function buildTree(flat, { keep = () => true, sort, mapNode } = {}) {
  */
 export function fetchCategories() {
   return once('categories', async () => {
-    let flat
-    try {
-      const res = await apiFetch('/faraz/v1/product-categories', { retries: 1 })
-      flat = await res.json()
-    } catch {
-      const res = await apiFetch(
-        `/wc/store/v1/products/categories?per_page=100&_fields=id,name,slug,parent,count`,
-      )
-      flat = await res.json()
-    }
+    const { categories: flat } = await fetchCatalog()
     if (!Array.isArray(flat)) return []
 
     return buildTree(flat, {
@@ -192,26 +295,21 @@ export function fetchCategories() {
 export function fetchMenu() {
   return once('menu', async () => {
     try {
-    // مهلت کوتاه اینجا خطرناک است: اگر منقضی شود کاربر فهرست ثابتِ متفاوتی
-    // می‌بیند. سرور وردپرس گاهی چند ثانیه طول می‌کشد، پس مهلت پیش‌فرض
-    // (۱۰ ثانیه با دو تلاش مجدد) را نگه می‌داریم.
-    const res = await apiFetch('/faraz/v1/site-menu')
-    if (!res.ok) return null
-    const flat = await res.json()
-    if (!Array.isArray(flat) || !flat.length) return null
+      const { menu: flat } = await fetchCatalog()
+      if (!Array.isArray(flat) || !flat.length) return null
 
-    // پاسخ تخت است (id/parent)؛ به درخت با هر عمقی تبدیلش می‌کنیم تا
-    // زیرمنوها و زیرِ زیرمنوها هم نمایش داده شوند.
-    const build = (parentId) =>
-      flat
-        .filter((m) => Number(m.parent) === parentId)
-        .sort((a, b) => Number(a.order) - Number(b.order))
-        .map((m) => ({
-          id: Number(m.id),
-          label: m.label,
-          to: m.url || '/',
-          children: build(Number(m.id)),
-        }))
+      // پاسخ تخت است (id/parent)؛ به درخت با هر عمقی تبدیلش می‌کنیم تا
+      // زیرمنوها و زیرِ زیرمنوها هم نمایش داده شوند.
+      const build = (parentId) =>
+        flat
+          .filter((m) => Number(m.parent) === parentId)
+          .sort((a, b) => Number(a.order) - Number(b.order))
+          .map((m) => ({
+            id: Number(m.id),
+            label: m.label,
+            to: m.url || '/',
+            children: build(Number(m.id)),
+          }))
 
       const tree = build(0)
       return tree.length ? tree : null
