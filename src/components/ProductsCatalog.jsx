@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -12,11 +12,13 @@ import {
   Check,
   SearchX,
   Loader2,
+  X,
 } from 'lucide-react'
 import ProductCard from './ProductCard.jsx'
 import SkeletonCards from './Skeleton.jsx'
 import { allProducts, categories as staticCats, sortOptions } from '../data.js'
 import { fetchProducts, fetchCategories } from '../lib/wp.js'
+import { buildAttrGroups, buildCatExpansion, filterProducts } from '../lib/productFilters.js'
 
 const faDigits = '۰۱۲۳۴۵۶۷۸۹'
 const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
@@ -147,62 +149,81 @@ export default function ProductsCatalog() {
   // در ووکامرس محصولات همیشه اسلاگ والد را ندارند — مثلاً تنها محصولِ
   // «منزل» فقط اسلاگ نوه‌اش «گلخانه» را دارد — پس بدون این گسترش، فیلترِ
   // والد صفر نتیجه می‌داد در حالی که وردپرس برایش تعداد نشان می‌دهد.
-  const expandedCats = useMemo(() => {
-    const map = {}
-    const walk = (node) => {
-      const slugs = [node.slug]
-      ;(node.children || []).forEach((child) => {
-        walk(child)
-        slugs.push(...(map[child.slug] || [child.slug]))
-      })
-      map[node.slug] = slugs
-      return slugs
-    }
-    catTree.forEach(walk)
-    return map
-  }, [catTree])
+  const expandedCats = useMemo(() => buildCatExpansion(catTree), [catTree])
 
-  // فیلترها از روی ویژگی‌های واقعی محصولات ساخته می‌شوند، نه فهرست ثابت.
-  // اگر در ووکامرس ویژگی‌ای تعریف نشده باشد، آن بخش از فیلتر اصلاً نمایش
-  // داده نمی‌شود تا کاربر با فیلترِ بی‌اثر روبه‌رو نشود.
-  const attrGroups = useMemo(() => {
-    const map = new Map()
-    products.forEach((p) =>
-      (p.attributes || []).forEach((a) => {
-        if (!a?.name || !a.values?.length) return
-        if (!map.has(a.name)) map.set(a.name, new Set())
-        a.values.forEach((v) => map.get(a.name).add(v))
-      }),
-    )
-    return [...map.entries()].map(([name, values]) => ({ name, values: [...values] }))
-  }, [products])
+  // گروه‌های فیلتر (رنگ، جنس، اندازه و …) از ویژگی‌های واقعی محصولات در
+  // ووکامرس ساخته می‌شوند؛ اگر ویژگی‌ای تعریف نشده باشد گروهی هم ساخته
+  // نمی‌شود تا فیلترِ بی‌اثر نمایش داده نشود.
+  const attrGroups = useMemo(() => buildAttrGroups(products), [products])
 
   const anyHeight = products.some((p) => typeof p.height === 'number')
 
-  const filtered = useMemo(() => {
-    const wanted = new Set(cats.flatMap((s) => expandedCats[s] || [s]))
-    const selected = Object.entries(attrSel)
-    return products.filter((p) => {
-      const catOk = cats.length === 0 || (p.catSlugs || []).some((s) => wanted.has(s))
-      // هر گروه ویژگی باید حداقل یکی از مقادیر انتخاب‌شده را داشته باشد
-      const attrOk = selected.every(([name, values]) => {
-        const attr = (p.attributes || []).find((a) => a.name === name)
-        return attr && attr.values.some((v) => values.includes(v))
-      })
-      const hOk = !anyHeight || (p.height >= minH && p.height <= maxH)
-      return catOk && attrOk && hOk
-    })
-  }, [products, cats, expandedCats, attrSel, minH, maxH, anyHeight])
+  const filtered = useMemo(
+    () =>
+      filterProducts(products, {
+        cats,
+        catExpansion: expandedCats,
+        attrSel,
+        height: { active: anyHeight, min: minH, max: maxH },
+      }),
+    [products, cats, expandedCats, attrSel, minH, maxH, anyHeight],
+  )
 
   const leftPct = ((minH - HEIGHT_MIN) / (HEIGHT_MAX - HEIGHT_MIN)) * 100
   const rightPct = ((maxH - HEIGHT_MIN) / (HEIGHT_MAX - HEIGHT_MIN)) * 100
 
-  // روی موبایل پنل فیلتر جمع است و با دکمه باز می‌شود؛ روی دسکتاپ همیشه باز است.
-  const [filtersOpen, setFiltersOpen] = useState(false)
   const activeCount =
     cats.length +
     Object.values(attrSel).reduce((n, v) => n + v.length, 0) +
     (anyHeight && (minH !== HEIGHT_MIN || maxH !== HEIGHT_MAX) ? 1 : 0)
+
+  // روی موبایل به‌جای پنل عمودی، نوار افقیِ فیلترها نمایش داده می‌شود و هر
+  // کدام گزینه‌هایش را در یک پاپ‌اور پایین صفحه باز می‌کند.
+  const [sheet, setSheet] = useState(null)
+  const mobileGroups = useMemo(
+    () => [
+      { key: 'cats', title: 'دسته بندی', type: 'cats', count: cats.length },
+      ...attrGroups.map((g) => ({
+        key: `attr:${g.name}`,
+        title: g.name,
+        type: 'attr',
+        name: g.name,
+        values: g.values,
+        count: (attrSel[g.name] || []).length,
+      })),
+      ...(anyHeight
+        ? [
+            {
+              key: 'height',
+              title: 'ارتفاع',
+              type: 'height',
+              count: minH !== HEIGHT_MIN || maxH !== HEIGHT_MAX ? 1 : 0,
+            },
+          ]
+        : []),
+    ],
+    [attrGroups, attrSel, cats.length, anyHeight, minH, maxH],
+  )
+  const activeSheet = mobileGroups.find((g) => g.key === sheet) || null
+
+  // پاپ‌اور باز = صفحه پشت آن اسکرول نشود
+  useEffect(() => {
+    document.body.style.overflow = activeSheet ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [activeSheet])
+
+  // هنگام بسته‌شدن، AnimatePresence همان خروجی رندر قبلی را نگه می‌دارد، پس
+  // نمی‌توان با prop خنثی‌اش کرد. مستقیم روی گره‌های DOM pointer-events را
+  // خاموش می‌کنیم تا اگر انیمیشن خروج کامل نشود، این لایه‌ها کلیک‌های صفحه
+  // را نگیرند.
+  const sheetRefs = useRef([])
+  useEffect(() => {
+    sheetRefs.current.forEach((el) => {
+      if (el) el.style.pointerEvents = activeSheet ? 'auto' : 'none'
+    })
+  }, [activeSheet])
 
   return (
     <section className="container-x py-16 sm:py-20">
@@ -212,44 +233,16 @@ export default function ProductsCatalog() {
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="glass h-fit rounded-3xl p-4 sm:p-6 lg:sticky lg:top-24"
+          className="glass hidden h-fit rounded-3xl p-4 sm:p-6 lg:sticky lg:top-24 lg:block"
         >
-          {/* موبایل: دکمه‌ی باز/بسته کردن پنل فیلتر */}
-          <button
-            type="button"
-            onClick={() => setFiltersOpen((v) => !v)}
-            aria-expanded={filtersOpen}
-            aria-controls="product-filters"
-            className="flex w-full items-center justify-between gap-2 lg:hidden"
-          >
-            <span className="flex items-center gap-2">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/30">
-                <SlidersHorizontal size={18} />
-              </span>
-              {activeCount > 0 && (
-                <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-bold text-brand-700">
-                  {toFa(activeCount)}
-                </span>
-              )}
-            </span>
-            <span className="flex items-center gap-2">
-              <h3 className="text-lg font-extrabold text-slate-800">فیلتر محصولات</h3>
-              <ChevronDown
-                size={18}
-                className={`text-slate-500 transition ${filtersOpen ? 'rotate-180' : ''}`}
-              />
-            </span>
-          </button>
-
-          {/* دسکتاپ: فقط عنوان — فیلترها همیشه بازند */}
-          <div className="mb-2 hidden items-center justify-between lg:flex">
+          <div className="mb-2 flex items-center justify-between">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/30">
               <SlidersHorizontal size={18} />
             </span>
             <h3 className="text-lg font-extrabold text-slate-800">فیلتر محصولات</h3>
           </div>
 
-          <div id="product-filters" className={`${filtersOpen ? 'block' : 'hidden'} lg:block`}>
+          <div id="product-filters">
           {/* دسته بندی */}
           <FilterBlock title="دسته بندی" collapsible open={catOpen} onToggle={() => setCatOpen((v) => !v)}>
             <ul className="max-h-80 space-y-3 overflow-auto pt-1">
@@ -340,6 +333,169 @@ export default function ProductsCatalog() {
           </button>
           </div>
         </motion.aside>
+
+        {/* ===== موبایل: نوار افقی فیلترها ===== */}
+        <div className="lg:hidden">
+          <div className="hide-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+            <span className="flex shrink-0 items-center gap-1.5 rounded-xl bg-brand-600 px-3 py-2.5 text-xs font-bold text-white">
+              <SlidersHorizontal size={15} />
+              فیلترها
+              {activeCount > 0 && (
+                <span className="rounded-full bg-white/25 px-1.5 text-[11px]">
+                  {toFa(activeCount)}
+                </span>
+              )}
+            </span>
+
+            {mobileGroups.map((g) => (
+              <button
+                key={g.key}
+                onClick={() => setSheet(g.key)}
+                className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3.5 py-2.5 text-xs font-bold transition ${
+                  g.count > 0
+                    ? 'bg-brand-600/10 text-brand-700 ring-1 ring-brand-300'
+                    : 'glass text-slate-600'
+                }`}
+              >
+                {g.title}
+                {g.count > 0 && (
+                  <span className="rounded-full bg-brand-600 px-1.5 text-[11px] text-white">
+                    {toFa(g.count)}
+                  </span>
+                )}
+                <ChevronDown size={14} className="opacity-60" />
+              </button>
+            ))}
+
+            {activeCount > 0 && (
+              <button
+                onClick={resetFilters}
+                className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border border-brand-200 bg-brand-50/80 px-3.5 py-2.5 text-xs font-bold text-brand-600"
+              >
+                <RotateCcw size={14} />
+                پاک کردن
+              </button>
+            )}
+          </div>
+
+          {/* پاپ‌اور انتخاب گزینه‌ها */}
+          <AnimatePresence>
+            {activeSheet && (
+              <>
+                <motion.div
+                  ref={(el) => (sheetRefs.current[0] = el)}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setSheet(null)}
+                  className="fixed inset-0 z-[90] bg-slate-900/40 backdrop-blur-sm"
+                />
+                <motion.div
+                  ref={(el) => (sheetRefs.current[1] = el)}
+                  initial={{ y: '100%' }}
+                  animate={{ y: 0 }}
+                  exit={{ y: '100%' }}
+                  transition={{ type: 'tween', duration: 0.28, ease: 'easeOut' }}
+                  className="glass-menu fixed inset-x-0 bottom-0 z-[91] max-h-[70vh] overflow-y-auto rounded-t-3xl p-5 pb-8"
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <button
+                      onClick={() => setSheet(null)}
+                      aria-label="بستن"
+                      className="rounded-lg p-1.5 text-slate-500 hover:bg-white/70"
+                    >
+                      <X size={18} />
+                    </button>
+                    <h4 className="text-base font-extrabold text-slate-800">
+                      {activeSheet.title}
+                    </h4>
+                  </div>
+
+                  {activeSheet.type === 'cats' ? (
+                    <ul className="space-y-3">
+                      <li>
+                        <CheckRow
+                          label="همه دسته بندی ها"
+                          checked={cats.length === 0}
+                          onClick={() => setCats([])}
+                        />
+                      </li>
+                      {catRows.map((c) => (
+                        <li
+                          key={c.slug}
+                          style={{ paddingInlineStart: c.depth ? c.depth * 14 : undefined }}
+                          className={c.depth ? 'border-r border-white/60' : undefined}
+                        >
+                          <CheckRow
+                            label={c.name}
+                            count={c.count}
+                            small={c.depth > 0}
+                            checked={cats.includes(c.slug)}
+                            onClick={() => toggle(setCats, cats, c.slug)}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  ) : activeSheet.type === 'height' ? (
+                    <div className="px-1 pt-2" dir="ltr">
+                      <div className="dual-range">
+                        <div className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-slate-200" />
+                        <div
+                          className="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-brand-600"
+                          style={{ left: `${leftPct}%`, right: `${100 - rightPct}%` }}
+                        />
+                        <input
+                          type="range"
+                          min={HEIGHT_MIN}
+                          max={HEIGHT_MAX}
+                          value={minH}
+                          onChange={(e) => setMinH(Math.min(Number(e.target.value), maxH - 5))}
+                        />
+                        <input
+                          type="range"
+                          min={HEIGHT_MIN}
+                          max={HEIGHT_MAX}
+                          value={maxH}
+                          onChange={(e) => setMaxH(Math.max(Number(e.target.value), minH + 5))}
+                        />
+                      </div>
+                      <div className="mt-3 flex justify-between text-xs font-semibold text-slate-600">
+                        <span>{toFa(minH)}</span>
+                        <span>{toFa(maxH)}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {activeSheet.values.map((v) => {
+                        const active = (attrSel[activeSheet.name] || []).includes(v)
+                        return (
+                          <button
+                            key={v}
+                            onClick={() => toggleAttr(activeSheet.name, v)}
+                            className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
+                              active
+                                ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/30'
+                                : 'glass text-slate-600'
+                            }`}
+                          >
+                            {v}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => setSheet(null)}
+                    className="mt-6 w-full rounded-xl bg-brand-600 py-3 text-sm font-bold text-white"
+                  >
+                    نمایش {toFa(filtered.length)} محصول
+                  </button>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* ===== ناحیه محصولات (چپ) ===== */}
         <div>
