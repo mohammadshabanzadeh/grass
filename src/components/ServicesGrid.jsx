@@ -12,8 +12,6 @@ const iconMap = {
   shield: ShieldCheck,
 }
 
-const faDigits = '۰۱۲۳۴۵۶۷۸۹'
-const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
 
 export default function ServicesGrid() {
   return (
@@ -36,11 +34,6 @@ export default function ServicesGrid() {
                 transition={{ duration: 0.5, delay: i * 0.08 }}
                 className="glass group relative flex flex-col items-center overflow-hidden rounded-3xl p-7 text-center transition duration-300 hover:-translate-y-2 hover:shadow-soft"
               >
-                {/* شماره کم‌رنگ */}
-                <span className="pointer-events-none absolute -left-2 -top-4 text-7xl font-black text-brand-500/10">
-                  {toFa(i + 1)}
-                </span>
-
                 <div
                   className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl text-white shadow-lg transition duration-300 group-hover:scale-110 group-hover:-rotate-6"
                   style={{ background: s.gradient }}

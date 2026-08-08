@@ -26,6 +26,9 @@ const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
 const HEIGHT_MIN = 10
 const HEIGHT_MAX = 50
 
+// دو ردیفِ کاملِ گرید دسکتاپ (چهار ستون)
+const PER_PAGE = 8
+
 // نسخه‌ی جایگزین (آفلاین) بر پایه‌ی داده‌های ثابت.
 // ویژگی‌ها همان شکلِ ووکامرس را می‌گیرند تا فیلترها با هر دو منبع
 // یکسان کار کنند.
@@ -168,6 +171,24 @@ export default function ProductsCatalog() {
       }),
     [products, cats, expandedCats, attrSel, minH, maxH, anyHeight],
   )
+
+  // دو ردیف در هر صفحه (گرید دسکتاپ چهار ستون دارد)، بقیه در صفحات بعدی
+  const gridRef = useRef(null)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
+  const pageItems = useMemo(
+    () => filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE),
+    [filtered, page],
+  )
+
+  // با تغییر فیلترها ممکن است صفحه‌ی فعلی دیگر وجود نداشته باشد
+  useEffect(() => {
+    if (page > totalPages) setPage(1)
+  }, [page, totalPages])
+
+  const goToPage = (n) => {
+    setPage(Math.min(Math.max(1, n), totalPages))
+    gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   const leftPct = ((minH - HEIGHT_MIN) / (HEIGHT_MAX - HEIGHT_MIN)) * 100
   const rightPct = ((maxH - HEIGHT_MIN) / (HEIGHT_MAX - HEIGHT_MIN)) * 100
@@ -498,7 +519,7 @@ export default function ProductsCatalog() {
         </div>
 
         {/* ===== ناحیه محصولات (چپ) ===== */}
-        <div>
+        <div ref={gridRef}>
           {/* تولبار */}
           <div className="glass mb-8 flex flex-col items-center gap-4 rounded-2xl px-5 py-4 sm:flex-row sm:justify-between">
             <div className="flex items-center gap-3">
@@ -583,7 +604,7 @@ export default function ProductsCatalog() {
               }
             >
               <AnimatePresence mode="popLayout">
-                {filtered.map((p, i) => (
+                {pageItems.map((p, i) => (
                   <ProductCard key={p.id} p={p} index={i} showFav linkText="مشاهده جزئیات" view={view} />
                 ))}
               </AnimatePresence>
@@ -605,17 +626,19 @@ export default function ProductsCatalog() {
             </motion.div>
           )}
 
-          {/* صفحه بندی */}
-          {filtered.length > 0 && (
-            <div className="mt-12 flex items-center justify-center gap-2">
-              <PageBtn onClick={() => setPage((p) => Math.max(1, p - 1))}>
+          {/* صفحه بندی — فقط وقتی بیش از یک صفحه وجود دارد */}
+          {!loading && totalPages > 1 && (
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-2">
+              <PageBtn disabled={page >= totalPages} onClick={() => goToPage(page + 1)}>
                 <ChevronLeft size={16} />
                 بعدی
               </PageBtn>
-              {[1, 2, 3].map((n) => (
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
                 <button
                   key={n}
-                  onClick={() => setPage(n)}
+                  onClick={() => goToPage(n)}
+                  aria-current={page === n ? 'page' : undefined}
                   className={`flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold transition ${
                     page === n
                       ? 'bg-brand-600 text-white shadow-md shadow-brand-600/30'
@@ -625,7 +648,8 @@ export default function ProductsCatalog() {
                   {toFa(n)}
                 </button>
               ))}
-              <PageBtn onClick={() => setPage((p) => Math.min(3, p + 1))}>
+
+              <PageBtn disabled={page <= 1} onClick={() => goToPage(page - 1)}>
                 قبلی
                 <ChevronRight size={16} />
               </PageBtn>
@@ -705,11 +729,12 @@ function ToggleBtn({ active, onClick, children }) {
   )
 }
 
-function PageBtn({ children, onClick }) {
+function PageBtn({ children, onClick, disabled = false }) {
   return (
     <button
       onClick={onClick}
-      className="glass flex items-center gap-1 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:text-brand-600"
+      disabled={disabled}
+      className="glass flex items-center gap-1 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 transition enabled:hover:text-brand-600 disabled:opacity-40"
     >
       {children}
     </button>

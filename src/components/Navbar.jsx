@@ -188,7 +188,9 @@ export default function Navbar() {
               <Phone size={17} />
             </span>
             <span className="text-right leading-tight">
-              <span className="block text-[10px] font-medium text-slate-500">تماس سریع</span>
+              <span className="block text-center text-[11px] font-extrabold text-slate-600">
+                تماس سریع
+              </span>
               {/* شماره تلفن ذاتاً چپ‌به‌راست است؛ با dir="rtl" ترتیب
                   گروه‌های عدد جابه‌جا می‌شد. */}
               <span className="block text-right text-sm font-extrabold text-slate-800" dir="ltr">
