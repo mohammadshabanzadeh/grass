@@ -189,7 +189,9 @@ export default function Navbar() {
             </span>
             <span className="text-right leading-tight">
               <span className="block text-[10px] font-medium text-slate-500">تماس سریع</span>
-              <span className="block text-sm font-extrabold text-slate-800" dir="rtl">
+              {/* شماره تلفن ذاتاً چپ‌به‌راست است؛ با dir="rtl" ترتیب
+                  گروه‌های عدد جابه‌جا می‌شد. */}
+              <span className="block text-right text-sm font-extrabold text-slate-800" dir="ltr">
                 {phone.value}
               </span>
             </span>
@@ -242,7 +244,7 @@ export default function Navbar() {
               className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-grass-500 px-4 py-3 text-sm font-bold text-white"
             >
               <Phone size={17} />
-              <span dir="rtl">{phone.value}</span>
+              <span dir="ltr">{phone.value}</span>
             </a>
           </motion.div>
         )}
