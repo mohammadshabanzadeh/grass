@@ -58,7 +58,7 @@ export default function ProductDetailPage() {
 
   if (status === 'loading') {
     return (
-      <section className="container-x pt-28 sm:pt-32">
+      <section className="container-x pt-4 sm:pt-5">
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="h-[22rem] animate-pulse rounded-3xl bg-white/50" />
           <div className="space-y-4">
@@ -78,7 +78,7 @@ export default function ProductDetailPage() {
 
   if (status !== 'ready') {
     return (
-      <section className="container-x flex min-h-[60vh] flex-col items-center justify-center gap-4 pt-28 text-center sm:pt-32">
+      <section className="container-x flex min-h-[60vh] flex-col items-center justify-center gap-4 pt-4 text-center sm:pt-5">
         <SearchX size={44} className="text-brand-500" />
         <p className="text-lg font-bold text-slate-700">
           {status === 'notfound' ? 'این محصول پیدا نشد' : 'در دریافت اطلاعات محصول مشکلی پیش آمد'}
@@ -99,7 +99,7 @@ export default function ProductDetailPage() {
 
   return (
     <>
-      <section className="container-x pt-28 sm:pt-32">
+      <section className="container-x pt-4 sm:pt-5">
         <Link
           to="/products"
           className="mb-5 inline-flex items-center gap-1.5 text-sm font-bold text-brand-600 transition hover:gap-2.5"

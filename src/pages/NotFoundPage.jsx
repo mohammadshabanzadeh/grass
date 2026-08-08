@@ -10,7 +10,7 @@ export default function NotFoundPage() {
   }, [])
 
   return (
-    <section className="container-x flex min-h-[70vh] flex-col items-center justify-center gap-5 pt-28 text-center sm:pt-32">
+    <section className="container-x flex min-h-[70vh] flex-col items-center justify-center gap-5 pt-4 text-center sm:pt-5">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}

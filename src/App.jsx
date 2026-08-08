@@ -6,6 +6,7 @@ import Footer from './components/Footer.jsx'
 import Preloader from './components/Preloader.jsx'
 import ScrollProgress from './components/ScrollProgress.jsx'
 import BackToTop from './components/BackToTop.jsx'
+import Breadcrumbs from './components/Breadcrumbs.jsx'
 import Home from './pages/Home.jsx'
 
 // صفحه‌ی خانه مستقیم لود می‌شود؛ بقیه‌ی صفحات فقط هنگام نیاز
@@ -69,6 +70,9 @@ export default function App() {
       <ScrollProgress />
       <div className="min-h-screen overflow-x-hidden">
         <Navbar />
+        {/* بردکرامب در همه‌ی صفحات جز صفحه‌ی اصلی؛ فاصله‌ی بالای صفحه را هم
+            همین می‌سازد، برای همین صفحات دیگر padding بالای زیادی ندارند. */}
+        <Breadcrumbs />
         <main>
           <AnimatedRoutes />
         </main>

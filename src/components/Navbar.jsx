@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, Menu, X, ChevronDown, ChevronLeft } from 'lucide-react'
+import { Phone, Menu, X, ChevronDown, ChevronLeft, Search } from 'lucide-react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import Logo from './Logo.jsx'
-import { navLinks } from '../data.js'
+import SearchDialog from './SearchDialog.jsx'
+import { navLinks, contactCards } from '../data.js'
 import { fetchMenu, fetchCategories } from '../lib/wp.js'
+
+// شماره‌ی تماس از همان منبعی خوانده می‌شود که صفحه‌ی تماس استفاده می‌کند
+const phone = contactCards.find((c) => c.icon === 'phone') || {}
 
 // فهرست ثابت سایت به همان شکل داده‌ی وردپرس درمی‌آید تا هر دو منبع با یک
 // کد رندر شوند.
@@ -29,8 +33,21 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState(STATIC_MENU)
   const [openIds, setOpenIds] = useState([]) // زیرمنوهای بازِ موبایل
+  const [searchOpen, setSearchOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
+
+  // میان‌بر صفحه‌کلید برای جست‌وجو (Ctrl/⌘ + K)
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setSearchOpen(true)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -151,22 +168,50 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <a
-          href="#contact"
-          onClick={(e) => go(e, '#contact')}
-          className="hidden items-center gap-2 rounded-xl border border-white/30 bg-grass-500/90 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-grass-500/30 backdrop-blur transition hover:-translate-y-0.5 hover:bg-grass-600 lg:flex"
-        >
-          <Phone size={17} />
-          مشاوره رایگان
-        </a>
+        <div className="flex items-center gap-2">
+          {/* جست‌وجو — در همه‌ی اندازه‌ها */}
+          <button
+            onClick={() => setSearchOpen(true)}
+            aria-label="جست‌وجو در سایت"
+            title="جست‌وجو (Ctrl+K)"
+            className="glass flex h-11 w-11 items-center justify-center rounded-xl text-brand-700 transition hover:bg-brand-600 hover:text-white"
+          >
+            <Search size={20} />
+          </button>
 
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="glass flex h-11 w-11 items-center justify-center rounded-xl text-brand-700 lg:hidden"
-          aria-label="منو"
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
+          {/* کادر شماره تماس (دسکتاپ) */}
+          <a
+            href={phone.href}
+            className="group hidden items-center gap-3 rounded-xl border border-grass-400/40 bg-gradient-to-l from-grass-500/15 to-brand-500/10 py-2 pl-4 pr-2 transition hover:-translate-y-0.5 hover:border-grass-400/70 hover:shadow-md lg:flex"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-grass-500 text-white shadow-md shadow-grass-500/30 transition group-hover:scale-105">
+              <Phone size={17} />
+            </span>
+            <span className="text-right leading-tight">
+              <span className="block text-[10px] font-medium text-slate-500">تماس سریع</span>
+              <span className="block text-sm font-extrabold text-slate-800" dir="rtl">
+                {phone.value}
+              </span>
+            </span>
+          </a>
+
+          {/* تماس سریع (موبایل) */}
+          <a
+            href={phone.href}
+            aria-label={`تماس با ${phone.value}`}
+            className="flex h-11 w-11 items-center justify-center rounded-xl bg-grass-500 text-white shadow-md shadow-grass-500/30 transition hover:bg-grass-600 lg:hidden"
+          >
+            <Phone size={19} />
+          </a>
+
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="glass flex h-11 w-11 items-center justify-center rounded-xl text-brand-700 lg:hidden"
+            aria-label="منو"
+          >
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </motion.nav>
 
       {/* ===== منوی موبایل ===== */}
@@ -193,16 +238,17 @@ export default function Navbar() {
               ))}
             </ul>
             <a
-              href="#contact"
-              onClick={(e) => go(e, '#contact')}
+              href={phone.href}
               className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-grass-500 px-4 py-3 text-sm font-bold text-white"
             >
               <Phone size={17} />
-              مشاوره رایگان
+              <span dir="rtl">{phone.value}</span>
             </a>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   )
 }

@@ -45,7 +45,7 @@ export default function ProjectDetailPage() {
     // اسکلت هم‌شکل صفحه‌ی نهایی: هیرو، متن و ستون مشخصات
     return (
       <>
-        <section className="container-x pt-28 sm:pt-32">
+        <section className="container-x pt-4 sm:pt-5">
           <Shimmer className="mb-5 h-4 w-32 rounded-lg" />
           <Shimmer className="min-h-[260px] rounded-[2rem] sm:min-h-[360px]" />
         </section>
@@ -70,7 +70,7 @@ export default function ProjectDetailPage() {
 
   if (status === 'notfound' || status === 'error') {
     return (
-      <section className="container-x flex min-h-[60vh] flex-col items-center justify-center gap-4 pt-28 text-center sm:pt-32">
+      <section className="container-x flex min-h-[60vh] flex-col items-center justify-center gap-4 pt-4 text-center sm:pt-5">
         <SearchX size={44} className="text-brand-500" />
         <p className="text-lg font-bold text-slate-700">
           {status === 'notfound' ? 'این پروژه یافت نشد' : 'در دریافت اطلاعات پروژه مشکلی پیش آمد'}
@@ -103,7 +103,7 @@ export default function ProjectDetailPage() {
 
   return (
     <>
-      <section className="container-x pt-28 sm:pt-32">
+      <section className="container-x pt-4 sm:pt-5">
         <Link
           to="/projects"
           className="mb-5 inline-flex items-center gap-1.5 text-sm font-bold text-brand-600 transition hover:gap-2.5"

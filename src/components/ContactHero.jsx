@@ -20,7 +20,7 @@ const channels = [
 
 export default function ContactHero() {
   return (
-    <section className="container-x pt-28 sm:pt-32">
+    <section className="container-x pt-4 sm:pt-5">
       <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
