@@ -38,25 +38,92 @@ async function apiFetch(path, { retries = 2, timeout = 10000 } = {}) {
   throw lastError
 }
 
-/** محصولات ووکامرس را می‌خواند و به شکل مورد نیاز کارت‌ها نگاشت می‌کند. */
-export async function fetchProducts() {
-  const res = await apiFetch(
-    `/wc/store/v1/products?per_page=100&_fields=id,name,slug,permalink,short_description,description,images,categories`,
-  )
-  const data = await res.json()
-  return data.map((p) => ({
+/**
+ * چند کامپوننت به یک داده نیاز دارند (مثلاً نوار منو و صفحه‌ی محصولات هر دو
+ * دسته‌بندی می‌خواهند). با نگه‌داشتن همان Promise، به‌جای چند درخواستِ
+ * تکراری روی سروری که کند است، فقط یک بار از شبکه گرفته می‌شود.
+ */
+const cache = new Map()
+const once = (key, fn) => {
+  if (!cache.has(key)) {
+    cache.set(
+      key,
+      fn().catch((err) => {
+        cache.delete(key) // خطا را کش نکن تا دفعه‌ی بعد دوباره تلاش شود
+        throw err
+      }),
+    )
+  }
+  return cache.get(key)
+}
+
+/** یک محصول ووکامرس را به شکل مورد نیاز کارت‌ها و صفحه‌ی محصول درمی‌آورد. */
+function mapProduct(p) {
+  return {
     id: p.id,
     title: p.name,
     slug: p.slug,
     link: p.permalink,
+    sku: p.sku || '',
     img: p.images?.[0]?.src || null,
+    images: (p.images || []).map((im) => im.src).filter(Boolean),
+    descHtml: p.description || '',
+    shortHtml: p.short_description || '',
     desc:
       stripHtml(p.short_description) ||
       stripHtml(p.description).slice(0, 90) ||
       (p.categories?.[0]?.name ?? 'چمن مصنوعی'),
+    inStock: p.is_in_stock !== false,
+    prices: p.prices || null,
+    attributes: (p.attributes || []).map((a) => ({
+      name: a.name,
+      values: (a.terms || []).map((t) => t.name),
+    })),
+    categories: (p.categories || []).map((c) => ({
+      id: c.id,
+      name: c.name,
+      slug: c.slug,
+      parent: c.parent ?? 0,
+    })),
     categoryNames: (p.categories || []).map((c) => c.name),
     categorySlugs: (p.categories || []).map((c) => c.slug),
-  }))
+  }
+}
+
+const PRODUCT_FIELDS =
+  'id,name,slug,permalink,sku,short_description,description,images,categories,attributes,prices,is_in_stock'
+
+/** محصولات ووکامرس را می‌خواند و به شکل مورد نیاز کارت‌ها نگاشت می‌کند. */
+export function fetchProducts() {
+  return once('products', async () => {
+    const res = await apiFetch(`/wc/store/v1/products?per_page=100&_fields=${PRODUCT_FIELDS}`)
+    const data = await res.json()
+    return data.map(mapProduct)
+  })
+}
+
+/** درصدکدگذاری را باز می‌کند تا اسلاگ فارسی و کدشده یکسان مقایسه شوند. */
+function decodeSlug(s = '') {
+  try {
+    return decodeURIComponent(s)
+  } catch {
+    return s
+  }
+}
+
+/**
+ * یک محصول مشخص را با اسلاگ آن برمی‌گرداند.
+ *
+ * از فهرست محصولات (که کش شده) پیدا می‌شود، نه با پارامتر slug در API:
+ * اسلاگ محصولات فارسیِ وردپرس به‌صورت درصدکدگذاری‌شده ذخیره می‌شود
+ * («%da%86%d9%85%d9%86-…») و فیلتر slug ووکامرس با هیچ‌کدام از حالت‌های
+ * کدگذاری آن را پیدا نمی‌کند. ضمناً مسیرِ آدرس را مرورگر رمزگشایی می‌کند،
+ * پس دو طرف مقایسه را رمزگشایی می‌کنیم تا هر دو شکل درست تطبیق داده شوند.
+ */
+export async function fetchProductBySlug(slug) {
+  const target = decodeSlug(slug)
+  const list = await fetchProducts()
+  return list.find((p) => decodeSlug(p.slug) === target) || null
 }
 
 /**
@@ -88,28 +155,30 @@ function buildTree(flat, { keep = () => true, sort, mapNode } = {}) {
  * اگر در دسترس نبود به Store API ووکامرس برمی‌گردیم.
  * دسته‌های بدون محصول کنار گذاشته می‌شوند تا لینک و فیلترِ بی‌نتیجه نسازند.
  */
-export async function fetchCategories() {
-  let flat
-  try {
-    const res = await apiFetch('/faraz/v1/product-categories', { retries: 1 })
-    flat = await res.json()
-  } catch {
-    const res = await apiFetch(
-      `/wc/store/v1/products/categories?per_page=100&_fields=id,name,slug,parent,count`,
-    )
-    flat = await res.json()
-  }
-  if (!Array.isArray(flat)) return []
+export function fetchCategories() {
+  return once('categories', async () => {
+    let flat
+    try {
+      const res = await apiFetch('/faraz/v1/product-categories', { retries: 1 })
+      flat = await res.json()
+    } catch {
+      const res = await apiFetch(
+        `/wc/store/v1/products/categories?per_page=100&_fields=id,name,slug,parent,count`,
+      )
+      flat = await res.json()
+    }
+    if (!Array.isArray(flat)) return []
 
-  return buildTree(flat, {
-    keep: (c) => Number(c.count) > 0,
-    sort: (a, b) => Number(b.count) - Number(a.count),
-    mapNode: (c) => ({
-      id: Number(c.id),
-      name: c.name,
-      slug: c.slug,
-      count: Number(c.count) || 0,
-    }),
+    return buildTree(flat, {
+      keep: (c) => Number(c.count) > 0,
+      sort: (a, b) => Number(b.count) - Number(a.count),
+      mapNode: (c) => ({
+        id: Number(c.id),
+        name: c.name,
+        slug: c.slug,
+        count: Number(c.count) || 0,
+      }),
+    })
   })
 }
 
@@ -120,8 +189,9 @@ export async function fetchCategories() {
  * می‌شود. اگر افزونه نصب نباشد null برمی‌گرداند تا فهرست ثابت سایت
  * دست‌نخورده بماند.
  */
-export async function fetchMenu() {
-  try {
+export function fetchMenu() {
+  return once('menu', async () => {
+    try {
     // مهلت کوتاه اینجا خطرناک است: اگر منقضی شود کاربر فهرست ثابتِ متفاوتی
     // می‌بیند. سرور وردپرس گاهی چند ثانیه طول می‌کشد، پس مهلت پیش‌فرض
     // (۱۰ ثانیه با دو تلاش مجدد) را نگه می‌داریم.
@@ -143,11 +213,12 @@ export async function fetchMenu() {
           children: build(Number(m.id)),
         }))
 
-    const tree = build(0)
-    return tree.length ? tree : null
-  } catch {
-    return null
-  }
+      const tree = build(0)
+      return tree.length ? tree : null
+    } catch {
+      return null
+    }
+  })
 }
 
 /** یک پست پروژه‌ی وردپرس را به شکل مورد نیاز کارت‌ها/صفحه‌ی اختصاصی نگاشت می‌کند. */
@@ -177,12 +248,14 @@ function mapProject(post) {
  * کنار گذاشته می‌شود چون تنها در صفحه‌ی اختصاصی استفاده می‌شود و بیشترِ
  * حجم و کندی پاسخ از همان می‌آمد (۳۹ کیلوبایت → ۷ کیلوبایت).
  */
-export async function fetchProjects() {
-  const res = await apiFetch(
-    `/wp/v2/project?per_page=100&_embed=wp:featuredmedia&_fields=id,slug,title,meta,_links,_embedded`,
-  )
-  const data = await res.json()
-  return data.map(mapProject)
+export function fetchProjects() {
+  return once('projects', async () => {
+    const res = await apiFetch(
+      `/wp/v2/project?per_page=100&_embed=wp:featuredmedia&_fields=id,slug,title,meta,_links,_embedded`,
+    )
+    const data = await res.json()
+    return data.map(mapProject)
+  })
 }
 
 /** یک پروژه‌ی مشخص را با شناسه‌ی عددی آن از وردپرس می‌خواند. */

@@ -1,5 +1,6 @@
 import { useState, forwardRef } from 'react'
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import {
   ArrowLeft,
   Heart,
@@ -60,15 +61,13 @@ const ProductCard = forwardRef(function ProductCard(
             <h4 className="text-lg font-extrabold text-slate-800">{p.title}</h4>
           </div>
           <p className="text-sm leading-7 text-slate-600">{p.desc}</p>
-          <a
-            href={p.link || '#'}
-            target={p.link ? '_blank' : undefined}
-            rel={p.link ? 'noreferrer' : undefined}
+          <Link
+            to={p.slug ? `/product/${p.slug}` : '/products'}
             className="mt-3 inline-flex w-fit items-center gap-1.5 text-sm font-bold text-brand-600 transition hover:gap-2.5"
           >
             {linkText}
             <ArrowLeft size={16} />
-          </a>
+          </Link>
         </div>
       </motion.article>
     )
@@ -112,15 +111,13 @@ const ProductCard = forwardRef(function ProductCard(
       <div className="px-5 pb-6 pt-10 text-center">
         <h4 className="text-lg font-extrabold text-slate-800">{p.title}</h4>
         <p className="mx-auto mt-2 max-w-[16rem] text-sm leading-7 text-slate-600">{p.desc}</p>
-        <a
-          href={p.link || '#'}
-          target={p.link ? '_blank' : undefined}
-          rel={p.link ? 'noreferrer' : undefined}
+        <Link
+          to={p.slug ? `/product/${p.slug}` : '/products'}
           className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-brand-600 transition hover:gap-2.5"
         >
           {linkText}
           <ArrowLeft size={16} />
-        </a>
+        </Link>
       </div>
     </motion.article>
   )

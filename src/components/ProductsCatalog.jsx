@@ -96,6 +96,7 @@ export default function ProductsCatalog() {
           prodRes.value.map((p) => ({
             id: p.id,
             title: p.title,
+            slug: p.slug, // برای لینک به صفحه‌ی اختصاصی محصول لازم است
             img: p.img,
             desc: p.desc,
             link: p.link,

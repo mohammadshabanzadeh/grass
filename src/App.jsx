@@ -16,6 +16,7 @@ const ProjectDetailPage = lazy(() => import('./pages/ProjectDetailPage.jsx'))
 const ServicesPage = lazy(() => import('./pages/ServicesPage.jsx'))
 const AboutPage = lazy(() => import('./pages/AboutPage.jsx'))
 const ContactPage = lazy(() => import('./pages/ContactPage.jsx'))
+const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage.jsx'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'))
 
 function AnimatedRoutes() {
@@ -45,6 +46,8 @@ function AnimatedRoutes() {
               اگر این دو، دو Route جدا باشند، جابجایی بینشان کامپوننت را
               از نو می‌سازد و هر بار داده‌ها دوباره از وردپرس گرفته می‌شوند. */}
           <Route path="/products/*" element={<ProductsPage />} />
+          {/* صفحه‌ی اختصاصی هر محصول — مسیر مفرد تا با دسته‌بندی‌ها تداخل نکند */}
+          <Route path="/product/:slug" element={<ProductDetailPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:id" element={<ProjectDetailPage />} />
           <Route path="/services" element={<ServicesPage />} />
