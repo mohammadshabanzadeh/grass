@@ -195,23 +195,53 @@ export function fetchProducts() {
  */
 export function fetchProductAttributes() {
   return once('attributes', async () => {
-    // بدون تلاش مجدد: این درخواست اختیاری است و نباید به سرورِ کند فشار بیاورد
-    const res = await apiFetch(`/wc/store/v1/products?per_page=100&_fields=id,attributes`, {
+    // تصاویر را هم در همین درخواست می‌گیریم: مسیر catalog فقط آدرس تصویر
+    // کامل (۸۰۰ پیکسل) را می‌دهد، ولی ووکامرس نسخه‌های ۳۰۰ و ۶۰۰ پیکسلی هم
+    // دارد و کارت‌ها در ~۳۰۰ پیکسل نمایش داده می‌شوند. چون این درخواست
+    // به‌هرحال زده می‌شود، srcset مجانی به دست می‌آید.
+    // بدون تلاش مجدد: اختیاری است و نباید به سرورِ کند فشار بیاورد.
+    const res = await apiFetch(`/wc/store/v1/products?per_page=100&_fields=id,attributes,images`, {
       retries: 0,
     })
     const rows = await res.json()
     const map = new Map()
     rows.forEach((p) =>
-      map.set(
-        p.id,
-        (p.attributes || []).map((a) => ({
+      map.set(p.id, {
+        attributes: (p.attributes || []).map((a) => ({
           name: a.name,
           values: (a.terms || []).map((t) => t.name),
         })),
-      ),
+        srcSet: trimSrcSet(p.images?.[0]?.srcset),
+      }),
     )
     return map
   })
+}
+
+/**
+ * از srcset وردپرس فقط کوچک‌ترین و بزرگ‌ترین نسخه را نگه می‌دارد.
+ * اندازه‌های میانیِ وردپرس بهینه نیستند — اندازه‌گیری روی همین سایت نشان داد
+ * نسخه‌ی ۶۰۰ پیکسلی دقیقاً هم‌حجم نسخه‌ی کامل است و نسخه‌ی ۷۶۸ پیکسلی حتی
+ * بزرگ‌تر (۶۲ در برابر ۴۷ کیلوبایت). نگه‌داشتن آن‌ها می‌توانست حجم را روی
+ * موبایل بیشتر کند، پس فقط نسخه‌ی کوچک (که واقعاً سبک‌تر است) و نسخه‌ی کامل
+ * می‌مانند تا انتخاب مرورگر هیچ‌وقت بدتر از حالت فعلی نشود.
+ */
+function trimSrcSet(srcset) {
+  if (!srcset) return undefined
+  const entries = srcset
+    .split(',')
+    .map((s) => s.trim())
+    .map((s) => {
+      const m = s.match(/^(\S+)\s+(\d+)w$/)
+      return m ? { url: m[1], w: Number(m[2]) } : null
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.w - b.w)
+
+  if (entries.length < 2) return undefined
+  const smallest = entries[0]
+  const largest = entries[entries.length - 1]
+  return `${smallest.url} ${smallest.w}w, ${largest.url} ${largest.w}w`
 }
 
 /** درصدکدگذاری را باز می‌کند تا اسلاگ فارسی و کدشده یکسان مقایسه شوند. */

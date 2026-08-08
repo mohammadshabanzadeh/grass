@@ -49,6 +49,8 @@ const ProductCard = forwardRef(function ProductCard(
             src={p.img}
             alt={p.title}
             gradient={p.gradient}
+            srcSet={p.srcSet}
+            sizes="(min-width: 640px) 14rem, 10rem"
             className="h-full w-full"
             imgClassName="transition duration-500 group-hover:scale-110"
           />
@@ -88,6 +90,11 @@ const ProductCard = forwardRef(function ProductCard(
           src={p.img}
           alt={p.title}
           gradient={p.gradient}
+          srcSet={p.srcSet}
+          // اندازه‌ی واقعی کارت اندازه‌گیری شده: در ۱۲۸۰ پیکسل هر ستون ۱۹۹
+          // پیکسل است (سایدبار ۳۲۰ پیکسلی را هم کم کنید). اعلام بزرگ‌تر از
+          // واقعیت باعث می‌شد مرورگر بی‌دلیل نسخه‌ی کامل را دانلود کند.
+          sizes="(min-width: 1280px) 210px, (min-width: 1024px) 300px, (min-width: 640px) 45vw, 92vw"
           className="h-44 w-full"
           imgClassName="transition duration-[600ms] group-hover:scale-110"
         />

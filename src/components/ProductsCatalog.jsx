@@ -119,7 +119,11 @@ export default function ProductsCatalog() {
         .then((map) => {
           if (!alive || !map.size) return
           setProducts((prev) =>
-            prev.map((p) => (map.has(p.id) ? { ...p, attributes: map.get(p.id) } : p)),
+            prev.map((p) => {
+              const extra = map.get(p.id)
+              if (!extra) return p
+              return { ...p, attributes: extra.attributes, srcSet: extra.srcSet }
+            }),
           )
         })
         .catch(() => {})

@@ -13,19 +13,21 @@ export default function SmartImage({
   priority = false, // برای تصاویر بالای صفحه (هیرو) تا زودتر لود شوند
   responsive = false, // نسخه‌های ۴۰۰ و ۸۰۰ پیکسلی هم موجود است
   sizes = '100vw', // عرض نمایش تصویر تا مرورگر مناسب‌ترین نسخه را بگیرد
+  srcSet: srcSetProp, // srcset آماده (مثلاً همان که وردپرس می‌دهد)
 }) {
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
 
-  // فقط برای تصاویر محلیِ هیرو که نسخه‌های کوچک‌تر برایشان ساخته شده.
-  // مرورگر بر اساس عرض واقعی نمایش، سبک‌ترین نسخه‌ی کافی را دانلود می‌کند.
+  // srcset یا از بیرون می‌آید (تصاویر وردپرس) یا برای تصاویر محلیِ هیرو
+  // ساخته می‌شود. در هر دو حالت مرورگر سبک‌ترین نسخه‌ی کافی را می‌گیرد.
   const srcSet =
-    responsive && src?.startsWith('/') && src.endsWith('.jpg')
+    srcSetProp ||
+    (responsive && src?.startsWith('/') && src.endsWith('.jpg')
       ? [400, 800]
           .map((w) => `${src.replace(/\.jpg$/, `-${w}.jpg`)} ${w}w`)
           .concat(`${src} 1600w`)
           .join(', ')
-      : undefined
+      : undefined)
 
   // اگر className خودش یک کلاس موقعیت (absolute/fixed/sticky) بدهد، «relative»
   // پیش‌فرض را اضافه نمی‌کنیم چون در Tailwind هر دو روی یک المان تداخل پیدا کرده
