@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   ArrowRight,
-  ArrowLeft,
   Phone,
   Layers,
   BadgeCheck,
@@ -238,7 +237,7 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6">
               <Link
                 to="/contact"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-600/30 transition hover:-translate-y-0.5 hover:bg-brand-700"
@@ -246,17 +245,6 @@ export default function ProductDetailPage() {
                 <Phone size={17} />
                 استعلام قیمت و مشاوره
               </Link>
-              {product.link && (
-                <a
-                  href={product.link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-200 bg-white/70 px-6 py-3.5 text-sm font-bold text-brand-700 transition hover:bg-white"
-                >
-                  صفحه محصول در فروشگاه
-                  <ArrowLeft size={16} />
-                </a>
-              )}
             </div>
           </motion.div>
         </div>

@@ -15,14 +15,7 @@ import {
 } from 'lucide-react'
 import ProductCard from './ProductCard.jsx'
 import SkeletonCards from './Skeleton.jsx'
-import {
-  allProducts,
-  categories as staticCats,
-  fiberTypes,
-  densities,
-  swatchColors,
-  sortOptions,
-} from '../data.js'
+import { allProducts, categories as staticCats, sortOptions } from '../data.js'
 import { fetchProducts, fetchCategories } from '../lib/wp.js'
 
 const faDigits = '۰۱۲۳۴۵۶۷۸۹'
@@ -31,7 +24,9 @@ const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
 const HEIGHT_MIN = 10
 const HEIGHT_MAX = 50
 
-// نسخه‌ی جایگزین (آفلاین) بر پایه‌ی داده‌های ثابت
+// نسخه‌ی جایگزین (آفلاین) بر پایه‌ی داده‌های ثابت.
+// ویژگی‌ها همان شکلِ ووکامرس را می‌گیرند تا فیلترها با هر دو منبع
+// یکسان کار کنند.
 const FALLBACK = allProducts.map((p) => ({
   id: p.id,
   title: p.title,
@@ -41,10 +36,11 @@ const FALLBACK = allProducts.map((p) => ({
   desc: p.desc,
   link: null,
   catSlugs: [p.category].filter(Boolean),
-  fiber: p.fiber,
-  color: p.color,
-  density: p.density,
   height: p.height,
+  attributes: [
+    p.fiber && { name: 'نوع الیاف', values: [p.fiber] },
+    p.density && { name: 'تراکم', values: [p.density] },
+  ].filter(Boolean),
 }))
 
 // دسته‌بندی‌های جایگزین، با همان شکل درختیِ داده‌ی وردپرس
@@ -70,9 +66,8 @@ export default function ProductsCatalog() {
   const [cats, setCats] = useState(catParam ? [catParam] : [])
   const [minH, setMinH] = useState(HEIGHT_MIN)
   const [maxH, setMaxH] = useState(HEIGHT_MAX)
-  const [fibers, setFibers] = useState([])
-  const [colors, setColors] = useState([])
-  const [dens, setDens] = useState([])
+  // انتخاب‌های ویژگی‌ها: { 'نوع الیاف': ['فیبریله'], ... }
+  const [attrSel, setAttrSel] = useState({})
   const [view, setView] = useState('grid')
   const [sort, setSort] = useState(sortOptions[0])
   const [sortOpen, setSortOpen] = useState(false)
@@ -101,6 +96,7 @@ export default function ProductsCatalog() {
             desc: p.desc,
             link: p.link,
             catSlugs: p.categorySlugs,
+            attributes: p.attributes || [],
           })),
         )
         setLive(true)
@@ -122,10 +118,17 @@ export default function ProductsCatalog() {
     setCats([])
     setMinH(HEIGHT_MIN)
     setMaxH(HEIGHT_MAX)
-    setFibers([])
-    setColors([])
-    setDens([])
+    setAttrSel({})
   }
+
+  const toggleAttr = (name, value) =>
+    setAttrSel((prev) => {
+      const cur = prev[name] || []
+      const next = cur.includes(value) ? cur.filter((v) => v !== value) : [...cur, value]
+      const out = { ...prev, [name]: next }
+      if (!next.length) delete out[name]
+      return out
+    })
 
   // درخت را برای نمایش به فهرستی مسطح با عمق تبدیل می‌کنیم تا هر تعداد
   // سطح (والد/فرزند/نوه) درست تودرتو نشان داده شود.
@@ -159,35 +162,37 @@ export default function ProductsCatalog() {
     return map
   }, [catTree])
 
-  const anyFiber = products.some((p) => p.fiber)
-  const anyColor = products.some((p) => p.color)
-  const anyDensity = products.some((p) => p.density)
+  // فیلترها از روی ویژگی‌های واقعی محصولات ساخته می‌شوند، نه فهرست ثابت.
+  // اگر در ووکامرس ویژگی‌ای تعریف نشده باشد، آن بخش از فیلتر اصلاً نمایش
+  // داده نمی‌شود تا کاربر با فیلترِ بی‌اثر روبه‌رو نشود.
+  const attrGroups = useMemo(() => {
+    const map = new Map()
+    products.forEach((p) =>
+      (p.attributes || []).forEach((a) => {
+        if (!a?.name || !a.values?.length) return
+        if (!map.has(a.name)) map.set(a.name, new Set())
+        a.values.forEach((v) => map.get(a.name).add(v))
+      }),
+    )
+    return [...map.entries()].map(([name, values]) => ({ name, values: [...values] }))
+  }, [products])
+
   const anyHeight = products.some((p) => typeof p.height === 'number')
 
   const filtered = useMemo(() => {
     const wanted = new Set(cats.flatMap((s) => expandedCats[s] || [s]))
+    const selected = Object.entries(attrSel)
     return products.filter((p) => {
       const catOk = cats.length === 0 || (p.catSlugs || []).some((s) => wanted.has(s))
-      const fiberOk = !anyFiber || fibers.length === 0 || fibers.includes(p.fiber)
-      const colorOk = !anyColor || colors.length === 0 || colors.includes(p.color)
-      const densOk = !anyDensity || dens.length === 0 || dens.includes(p.density)
+      // هر گروه ویژگی باید حداقل یکی از مقادیر انتخاب‌شده را داشته باشد
+      const attrOk = selected.every(([name, values]) => {
+        const attr = (p.attributes || []).find((a) => a.name === name)
+        return attr && attr.values.some((v) => values.includes(v))
+      })
       const hOk = !anyHeight || (p.height >= minH && p.height <= maxH)
-      return catOk && fiberOk && colorOk && densOk && hOk
+      return catOk && attrOk && hOk
     })
-  }, [
-    products,
-    cats,
-    expandedCats,
-    fibers,
-    colors,
-    dens,
-    minH,
-    maxH,
-    anyFiber,
-    anyColor,
-    anyDensity,
-    anyHeight,
-  ])
+  }, [products, cats, expandedCats, attrSel, minH, maxH, anyHeight])
 
   const leftPct = ((minH - HEIGHT_MIN) / (HEIGHT_MAX - HEIGHT_MIN)) * 100
   const rightPct = ((maxH - HEIGHT_MIN) / (HEIGHT_MAX - HEIGHT_MIN)) * 100
@@ -196,10 +201,8 @@ export default function ProductsCatalog() {
   const [filtersOpen, setFiltersOpen] = useState(false)
   const activeCount =
     cats.length +
-    fibers.length +
-    colors.length +
-    dens.length +
-    (minH !== HEIGHT_MIN || maxH !== HEIGHT_MAX ? 1 : 0)
+    Object.values(attrSel).reduce((n, v) => n + v.length, 0) +
+    (anyHeight && (minH !== HEIGHT_MIN || maxH !== HEIGHT_MAX) ? 1 : 0)
 
   return (
     <section className="container-x py-16 sm:py-20">
@@ -271,7 +274,8 @@ export default function ProductsCatalog() {
             </ul>
           </FilterBlock>
 
-          {/* ارتفاع چمن */}
+          {/* ارتفاع چمن — فقط وقتی محصولی ارتفاع دارد */}
+          {anyHeight && (
           <FilterBlock title="ارتفاع چمن (میلی متر)">
             <div className="px-1 pt-4" dir="ltr">
               <div className="dual-range">
@@ -301,65 +305,31 @@ export default function ProductsCatalog() {
               </div>
             </div>
           </FilterBlock>
+          )}
 
-          {/* نوع الیاف */}
-          <FilterBlock title="نوع الیاف">
-            <ul className="space-y-3 pt-1">
-              {fiberTypes.map((f) => (
-                <li key={f}>
-                  <CheckRow label={f} checked={fibers.includes(f)} onClick={() => toggle(setFibers, fibers, f)} />
-                </li>
-              ))}
-            </ul>
-          </FilterBlock>
-
-          {/* رنگ */}
-          <FilterBlock title="رنگ">
-            <div className="flex gap-3 pt-1">
-              {swatchColors.map((c) => {
-                const active = colors.includes(c.hex)
-                return (
-                  <button
-                    key={c.hex}
-                    onClick={() => toggle(setColors, colors, c.hex)}
-                    aria-label={c.name}
-                    className={`relative h-9 w-9 rounded-full ring-offset-2 transition hover:scale-110 ${
-                      active ? 'ring-2 ring-brand-600' : 'ring-1 ring-white/60'
-                    }`}
-                    style={{ background: c.hex }}
-                  >
-                    {active && (
-                      <span className="absolute inset-0 flex items-center justify-center text-white">
-                        <Check size={15} strokeWidth={3} />
-                      </span>
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-          </FilterBlock>
-
-          {/* تراکم */}
-          <FilterBlock title="تراکم" last>
-            <div className="flex flex-wrap gap-2 pt-1">
-              {densities.map((d) => {
-                const active = dens.includes(d)
-                return (
-                  <button
-                    key={d}
-                    onClick={() => toggle(setDens, dens, d)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                      active
-                        ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/30'
-                        : 'glass text-slate-600 hover:text-brand-600'
-                    }`}
-                  >
-                    {d}
-                  </button>
-                )
-              })}
-            </div>
-          </FilterBlock>
+          {/* ویژگی‌های محصول — مستقیماً از ویژگی‌های ووکامرس ساخته می‌شوند */}
+          {attrGroups.map((g, i) => (
+            <FilterBlock key={g.name} title={g.name} last={i === attrGroups.length - 1}>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {g.values.map((v) => {
+                  const active = (attrSel[g.name] || []).includes(v)
+                  return (
+                    <button
+                      key={v}
+                      onClick={() => toggleAttr(g.name, v)}
+                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                        active
+                          ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/30'
+                          : 'glass text-slate-600 hover:text-brand-600'
+                      }`}
+                    >
+                      {v}
+                    </button>
+                  )
+                })}
+              </div>
+            </FilterBlock>
+          ))}
 
           <button
             onClick={resetFilters}
