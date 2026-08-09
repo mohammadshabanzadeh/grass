@@ -53,6 +53,64 @@ async function apiFetch(path, { retries = 1, timeout = 20000 } = {}) {
  * دسته‌بندی می‌خواهند). با نگه‌داشتن همان Promise، به‌جای چند درخواستِ
  * تکراری روی سروری که کند است، فقط یک بار از شبکه گرفته می‌شود.
  */
+/**
+ * داده‌ی از پیش آماده.
+ *
+ * هنگام بیلد، محتوای وردپرس یک بار گرفته و داخل خودِ HTML قرار می‌گیرد
+ * (globalThis.__WP_DATA__). دو فایده دارد:
+ *  ۱) خزنده‌ی گوگل محتوای واقعی را در سورس صفحه می‌بیند، نه یک div خالی.
+ *  ۲) کاربر هم بلافاصله محتوا را می‌بیند و منتظر سرور کندِ وردپرس نمی‌ماند؛
+ *     داده‌ی تازه در پس‌زمینه گرفته می‌شود.
+ */
+function seed() {
+  return typeof globalThis !== 'undefined' ? globalThis.__WP_DATA__ || null : null
+}
+
+/** داده‌ی آماده‌ی کاتالوگ (بدون درخواست شبکه) — یا null اگر موجود نباشد. */
+export function seededCatalog() {
+  const s = seed()
+  return s?.catalog?.products ? s.catalog : null
+}
+
+/** فهرست آماده‌ی پروژه‌ها (بدون درخواست شبکه) — یا null. */
+export function seededProjects() {
+  const s = seed()
+  return Array.isArray(s?.projects) ? s.projects.map(mapProject) : null
+}
+
+/** محصولاتِ آماده به شکل مورد نیاز کارت‌ها — یا null. */
+export function seededProducts() {
+  const c = seededCatalog()
+  return c ? c.products.map(mapProduct) : null
+}
+
+/** درخت آماده‌ی دسته‌بندی‌ها — یا null. */
+export function seededCategories() {
+  const c = seededCatalog()
+  return c ? buildCategoryTree(c.categories || []) : null
+}
+
+/** فهرست آماده‌ی منو — یا null. */
+export function seededMenu() {
+  const c = seededCatalog()
+  return c ? buildMenuTree(c.menu || []) : null
+}
+
+/** یک محصول از داده‌ی آماده، با اسلاگ — یا null. */
+export function seededProductBySlug(slug) {
+  const list = seededProducts()
+  if (!list) return null
+  const target = decodeSlug(slug)
+  return list.find((p) => decodeSlug(p.slug) === target) || null
+}
+
+/** یک پروژه از داده‌ی آماده، با شناسه — یا null. */
+export function seededProjectById(id) {
+  const list = seededProjects()
+  if (!list) return null
+  return list.find((p) => String(p.id) === String(id)) || null
+}
+
 const cache = new Map()
 const once = (key, fn) => {
   if (!cache.has(key)) {
@@ -163,6 +221,12 @@ async function loadSeparately() {
  */
 export function fetchCatalog() {
   return once('catalog', async () => {
+    // داده‌ی جاسازی‌شده در HTML: بدون هیچ انتظاری آماده است
+    const embedded = seededCatalog()
+    if (embedded) {
+      loadCatalogFresh().catch(() => {})
+      return embedded
+    }
     const cached = readSession()
     if (cached) {
       // تازه‌سازی در پس‌زمینه؛ نتیجه‌اش برای بارگذاری بعدی استفاده می‌شود
@@ -315,6 +379,20 @@ function buildTree(flat, { keep = () => true, sort, mapNode } = {}) {
  * اگر در دسترس نبود به Store API ووکامرس برمی‌گردیم.
  * دسته‌های بدون محصول کنار گذاشته می‌شوند تا لینک و فیلترِ بی‌نتیجه نسازند.
  */
+export function buildCategoryTree(flat) {
+  if (!Array.isArray(flat)) return []
+  return buildTree(flat, {
+    keep: (c) => Number(c.count) > 0,
+    sort: (a, b) => Number(b.count) - Number(a.count),
+    mapNode: (c) => ({
+      id: Number(c.id),
+      name: c.name,
+      slug: c.slug,
+      count: Number(c.count) || 0,
+    }),
+  })
+}
+
 export function fetchCategories() {
   return once('categories', async () => {
     const { categories: flat } = await fetchCatalog()
@@ -340,27 +418,29 @@ export function fetchCategories() {
  * می‌شود. اگر افزونه نصب نباشد null برمی‌گرداند تا فهرست ثابت سایت
  * دست‌نخورده بماند.
  */
+export function buildMenuTree(flat) {
+  if (!Array.isArray(flat) || !flat.length) return null
+  // پاسخ تخت است (id/parent)؛ به درخت با هر عمقی تبدیلش می‌کنیم تا
+  // زیرمنوها و زیرِ زیرمنوها هم نمایش داده شوند.
+  const build = (parentId) =>
+    flat
+      .filter((m) => Number(m.parent) === parentId)
+      .sort((a, b) => Number(a.order) - Number(b.order))
+      .map((m) => ({
+        id: Number(m.id),
+        label: m.label,
+        to: m.url || '/',
+        children: build(Number(m.id)),
+      }))
+  const tree = build(0)
+  return tree.length ? tree : null
+}
+
 export function fetchMenu() {
   return once('menu', async () => {
     try {
       const { menu: flat } = await fetchCatalog()
-      if (!Array.isArray(flat) || !flat.length) return null
-
-      // پاسخ تخت است (id/parent)؛ به درخت با هر عمقی تبدیلش می‌کنیم تا
-      // زیرمنوها و زیرِ زیرمنوها هم نمایش داده شوند.
-      const build = (parentId) =>
-        flat
-          .filter((m) => Number(m.parent) === parentId)
-          .sort((a, b) => Number(a.order) - Number(b.order))
-          .map((m) => ({
-            id: Number(m.id),
-            label: m.label,
-            to: m.url || '/',
-            children: build(Number(m.id)),
-          }))
-
-      const tree = build(0)
-      return tree.length ? tree : null
+      return buildMenuTree(flat)
     } catch {
       return null
     }
@@ -396,6 +476,8 @@ function mapProject(post) {
  */
 export function fetchProjects() {
   return once('projects', async () => {
+    const embedded = seededProjects()
+    if (embedded) return embedded
     const res = await apiFetch(
       `/wp/v2/project?per_page=100&_embed=wp:featuredmedia&_fields=id,slug,title,meta,_links,_embedded`,
     )

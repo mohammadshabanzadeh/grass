@@ -5,13 +5,16 @@ import { useNavigate, Link } from 'react-router-dom'
 import SmartImage from './SmartImage.jsx'
 import SectionHeading from './SectionHeading.jsx'
 import { projects as fallbackProjects } from '../data.js'
-import { fetchProjects } from '../lib/wp.js'
+import { fetchProjects, seededProjects } from '../lib/wp.js'
 
 const MAX = 5
 
 export default function Projects() {
   const navigate = useNavigate()
-  const [items, setItems] = useState(null) // null = هنوز در حال دریافت
+  const [items, setItems] = useState(() => {
+    const s = seededProjects()
+    return s ? s.slice(0, MAX) : null // null = هنوز در حال دریافت
+  })
 
   useEffect(() => {
     let alive = true

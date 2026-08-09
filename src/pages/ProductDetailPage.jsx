@@ -14,7 +14,7 @@ import {
 import SmartImage from '../components/SmartImage.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import CTA from '../components/CTA.jsx'
-import { fetchProductBySlug, fetchProducts } from '../lib/wp.js'
+import { fetchProductBySlug, fetchProducts, seededProductBySlug } from '../lib/wp.js'
 import { useSeo, productSchema } from '../lib/seo.js'
 
 const faDigits = '۰۱۲۳۴۵۶۷۸۹'
@@ -22,9 +22,9 @@ const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
 
 export default function ProductDetailPage() {
   const { slug } = useParams()
-  const [product, setProduct] = useState(null)
+  const [product, setProduct] = useState(() => seededProductBySlug(slug))
   const [related, setRelated] = useState([])
-  const [status, setStatus] = useState('loading') // loading | ready | notfound | error
+  const [status, setStatus] = useState(() => (seededProductBySlug(slug) ? 'ready' : 'loading'))
   const [active, setActive] = useState(0)
 
   // عنوان و متاهای صفحه از خودِ محصول ساخته می‌شوند

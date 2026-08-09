@@ -5,7 +5,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom'
 import Logo from './Logo.jsx'
 import SearchDialog from './SearchDialog.jsx'
 import { navLinks, contactCards } from '../data.js'
-import { fetchMenu, fetchCategories } from '../lib/wp.js'
+import { fetchMenu, fetchCategories, seededMenu, seededCategories } from '../lib/wp.js'
 
 // شماره‌ی تماس از همان منبعی خوانده می‌شود که صفحه‌ی تماس استفاده می‌کند
 const phone = contactCards.find((c) => c.icon === 'phone') || {}
@@ -31,7 +31,18 @@ const catsToMenu = (nodes) =>
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
-  const [items, setItems] = useState(STATIC_MENU)
+  // منو از داده‌ی جاسازی‌شده شروع می‌شود تا در HTML ثابت هم دیده شود
+  const [items, setItems] = useState(() => {
+    const menu = seededMenu() || STATIC_MENU
+    const cats = seededCategories()
+    if (!cats?.length) return menu
+    const subs = catsToMenu(cats)
+    return menu.map((it) =>
+      it.to === '/products' && (!it.children || it.children.length === 0)
+        ? { ...it, children: subs }
+        : it,
+    )
+  })
   const [openIds, setOpenIds] = useState([]) // زیرمنوهای بازِ موبایل
   const [searchOpen, setSearchOpen] = useState(false)
   const navigate = useNavigate()

@@ -12,6 +12,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "preview", "--", "--port", "4173"],
       "port": 4173
+    },
+    {
+      "name": "grass-static",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/serve-static.mjs"],
+      "port": 4180
     }
   ]
 }

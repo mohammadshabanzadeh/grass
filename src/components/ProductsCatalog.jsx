@@ -17,7 +17,13 @@ import {
 import ProductCard from './ProductCard.jsx'
 import SkeletonCards from './Skeleton.jsx'
 import { allProducts, categories as staticCats, sortOptions } from '../data.js'
-import { fetchProducts, fetchCategories, fetchProductAttributes } from '../lib/wp.js'
+import {
+  fetchProducts,
+  fetchCategories,
+  fetchProductAttributes,
+  seededProducts,
+  seededCategories,
+} from '../lib/wp.js'
 import { buildAttrGroups, buildCatExpansion, filterProducts } from '../lib/productFilters.js'
 
 const faDigits = '۰۱۲۳۴۵۶۷۸۹'
@@ -54,10 +60,10 @@ const FALLBACK_CATS = staticCats
   .map((c) => ({ id: c.key, name: c.label, slug: c.key, count: 0, children: [] }))
 
 export default function ProductsCatalog() {
-  const [products, setProducts] = useState(FALLBACK)
-  const [catTree, setCatTree] = useState(FALLBACK_CATS)
+  const [products, setProducts] = useState(() => seededProducts() || FALLBACK)
+  const [catTree, setCatTree] = useState(() => seededCategories() || FALLBACK_CATS)
   const [live, setLive] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => !seededProducts())
 
   // دسته از خودِ مسیر خوانده می‌شود، بدون پارامتر در آدرس:
   // /products/decorative-artificial-grass/residential/patio → «گلخانه»

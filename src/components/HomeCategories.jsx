@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
 import SmartImage from './SmartImage.jsx'
 import SectionHeading from './SectionHeading.jsx'
-import { fetchCategories, fetchProducts } from '../lib/wp.js'
+import { fetchCategories, fetchProducts, seededCategories, seededProducts } from '../lib/wp.js'
 
 const faDigits = '۰۱۲۳۴۵۶۷۸۹'
 const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
@@ -12,9 +12,9 @@ const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
 const MAX = 6
 
 export default function HomeCategories() {
-  const [cats, setCats] = useState([])
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [cats, setCats] = useState(() => seededCategories() || [])
+  const [products, setProducts] = useState(() => seededProducts() || [])
+  const [loading, setLoading] = useState(() => !seededCategories())
 
   useEffect(() => {
     let alive = true

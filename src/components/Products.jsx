@@ -5,14 +5,14 @@ import { ChevronRight, ChevronLeft, ArrowLeft } from 'lucide-react'
 import SmartImage from './SmartImage.jsx'
 import SectionHeading from './SectionHeading.jsx'
 import { products as fallbackProducts } from '../data.js'
-import { fetchProducts } from '../lib/wp.js'
+import { fetchProducts, seededProducts } from '../lib/wp.js'
 
 // چند کارت در هر طرفِ کارت مرکزی دیده شود
 const SIDE = 2
 
 export default function Products() {
-  const [items, setItems] = useState(fallbackProducts)
-  const [loading, setLoading] = useState(true)
+  const [items, setItems] = useState(() => seededProducts() || fallbackProducts)
+  const [loading, setLoading] = useState(() => !seededProducts())
   const [active, setActive] = useState(0)
   const [dir, setDir] = useState(0)
   // فاصله‌ی افقی کارت‌ها به عرض صفحه بستگی دارد؛ با تغییر اندازه به‌روز می‌شود

@@ -14,7 +14,7 @@ import {
 import ProjectCard from './ProjectCard.jsx'
 import SkeletonCards from './Skeleton.jsx'
 import { projectCategories, usageTypes, projectSortOptions } from '../data.js'
-import { fetchProjects } from '../lib/wp.js'
+import { fetchProjects, seededProjects } from '../lib/wp.js'
 
 const faDigits = '۰۱۲۳۴۵۶۷۸۹'
 const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
@@ -24,8 +24,8 @@ const AREA_MIN = 0
 const AREA_MAX = 5000
 
 export default function ProjectsCatalog() {
-  const [allProjects, setAllProjects] = useState([])
-  const [status, setStatus] = useState('loading') // loading | ready | error
+  const [allProjects, setAllProjects] = useState(() => seededProjects() || [])
+  const [status, setStatus] = useState(() => (seededProjects() ? 'ready' : 'loading')) // loading | ready | error
 
   const [cats, setCats] = useState([])
   const [usages, setUsages] = useState([])

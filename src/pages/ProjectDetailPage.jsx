@@ -5,7 +5,7 @@ import { ArrowRight, MapPin, Maximize, Tag, Layers, SearchX } from 'lucide-react
 import SmartImage from '../components/SmartImage.jsx'
 import { Shimmer } from '../components/Skeleton.jsx'
 import CTA from '../components/CTA.jsx'
-import { fetchProjectById } from '../lib/wp.js'
+import { fetchProjectById, seededProjectById } from '../lib/wp.js'
 import { projectCategories, usageTypes } from '../data.js'
 import { useSeo } from '../lib/seo.js'
 
@@ -17,8 +17,8 @@ const usageLabel = (key) => usageTypes.find((u) => u.key === key)?.label || key
 
 export default function ProjectDetailPage() {
   const { id } = useParams()
-  const [project, setProject] = useState(null)
-  const [status, setStatus] = useState('loading') // loading | ready | notfound | error
+  const [project, setProject] = useState(() => seededProjectById(id))
+  const [status, setStatus] = useState(() => (seededProjectById(id) ? 'ready' : 'loading'))
 
   // عنوان و متاهای صفحه از خودِ پروژه ساخته می‌شوند
   useSeo({
