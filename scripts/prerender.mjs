@@ -69,6 +69,27 @@ async function loadWpData() {
   } catch (e) {
     log('projects failed —', e.message)
   }
+
+  // ویژگی‌ها و نسخه‌های کوچک‌تر تصویر فقط از Store API ووکامرس می‌آیند، و آن
+  // مسیر برخلاف faraz/v1 هدر CORS نمی‌فرستد؛ یعنی مرورگر روی دامنه‌ی سایت
+  // نمی‌تواند آن را بخواند. این‌جا (سمت سرور، بدون محدودیت CORS) گرفته و
+  // داخل همان داده‌ی جاسازی‌شده قرار می‌گیرد.
+  try {
+    const rows = await get(`${WP}/wc/store/v1/products?per_page=100&_fields=id,attributes,images`)
+    out.productMeta = rows.map((p) => ({
+      id: p.id,
+      attributes: (p.attributes || []).map((a) => ({
+        name: a.name,
+        values: (a.terms || []).map((t) => t.name),
+      })),
+      srcset: p.images?.[0]?.srcset || null,
+    }))
+    const withAttrs = out.productMeta.filter((p) => p.attributes.length).length
+    log(`product meta: ${out.productMeta.length} rows (${withAttrs} with attributes)`)
+  } catch (e) {
+    log('product meta failed —', e.message)
+  }
+
   return out
 }
 

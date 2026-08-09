@@ -271,6 +271,18 @@ export function fetchProducts() {
  */
 export function fetchProductAttributes() {
   return once('attributes', async () => {
+    // اگر هنگام بیلد گرفته شده، همان را استفاده کن. مسیر Store API ووکامرس
+    // هدر CORS نمی‌فرستد، پس این درخواست از دامنه‌ی سایت شکست می‌خورد و
+    // بدون این داده‌ی آماده، فیلترهای ویژگی و تصاویر کوچک‌تر از دست می‌رفتند.
+    const embedded = seed()?.productMeta
+    if (Array.isArray(embedded)) {
+      const m = new Map()
+      embedded.forEach((p) =>
+        m.set(p.id, { attributes: p.attributes || [], srcSet: trimSrcSet(p.srcset) }),
+      )
+      return m
+    }
+
     // این تنها داده‌ای است که فقط از Store API ووکامرس می‌آید و آن مسیر
     // هدر CORS نمی‌فرستد. وقتی سایت مستقیم (بدون پروکسی) به وردپرس وصل
     // می‌شود مرورگر این درخواست را بلاک می‌کند و در نتیجه فیلترهای ویژگی و
