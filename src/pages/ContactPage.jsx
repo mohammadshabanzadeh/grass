@@ -4,8 +4,15 @@ import ContactHero from '../components/ContactHero.jsx'
 import ContactForm from '../components/ContactForm.jsx'
 import ContactLocation from '../components/ContactLocation.jsx'
 import CTA from '../components/CTA.jsx'
+import { useSeo } from '../lib/seo.js'
 
 export default function ContactPage() {
+  useSeo({
+    title: 'تماس با ما',
+    description:
+      'برای مشاوره رایگان، استعلام قیمت و بازدید پروژه با کارشناسان فراز چمن در تماس باشید',
+  })
+
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])

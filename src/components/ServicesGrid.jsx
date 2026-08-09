@@ -41,7 +41,7 @@ export default function ServicesGrid() {
                   <Icon size={30} />
                 </div>
 
-                <h4 className="mb-2 text-lg font-extrabold text-slate-800">{s.title}</h4>
+                <h3 className="mb-2 text-lg font-extrabold text-slate-800">{s.title}</h3>
                 <p className="text-sm leading-8 text-slate-600">{s.desc}</p>
 
                 <div className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-brand-600 opacity-0 transition-all duration-300 group-hover:gap-2.5 group-hover:opacity-100">

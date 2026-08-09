@@ -16,7 +16,7 @@ export default function Logo({ light = false, size = 'md' }) {
           onError={() => setImgOk(false)}
           className={`${iconSizeClass} shrink-0 object-contain`}
         />
-        <h1 className={`${textSize} font-extrabold ${titleColor}`}>فراز چمن</h1>
+        <span className={`${textSize} font-extrabold ${titleColor}`}>فراز چمن</span>
       </div>
     )
   }
@@ -28,7 +28,7 @@ export default function Logo({ light = false, size = 'md' }) {
   return (
     <div className="flex items-center gap-2.5">
       <div className="text-right leading-tight">
-        <h1 className={`text-xl font-extrabold sm:text-2xl ${titleColor}`}>فراز چمن</h1>
+        <span className={`block text-xl font-extrabold sm:text-2xl ${titleColor}`}>فراز چمن</span>
         <p className={`text-[11px] font-medium ${subColor}`}>فروش و نصب چمن مصنوعی</p>
       </div>
       <svg width={svgSize} height={svgSize} viewBox="0 0 48 48" fill="none" className="shrink-0">

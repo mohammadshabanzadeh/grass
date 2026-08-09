@@ -49,7 +49,8 @@ export default function Hero() {
               زیبایی ماندگار، کیفیت بی‌نظیر
             </motion.div>
 
-            <motion.h2
+            {/* تنها h1 صفحه‌ی اصلی — موضوع واقعی صفحه */}
+            <motion.h1
               variants={fadeUp}
               initial="hidden"
               animate="show"
@@ -59,7 +60,7 @@ export default function Hero() {
               مرجع تخصصی اجرای
               <br />
               <span className="text-brand-600">چمن مصنوعی</span> در ایران
-            </motion.h2>
+            </motion.h1>
 
             {/* کادر ویژه‌ی استاندارد فیفا */}
             <motion.div

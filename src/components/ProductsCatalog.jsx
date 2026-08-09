@@ -278,7 +278,7 @@ export default function ProductsCatalog() {
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/30">
               <SlidersHorizontal size={18} />
             </span>
-            <h3 className="text-lg font-extrabold text-slate-800">فیلتر محصولات</h3>
+            <h2 className="text-lg font-extrabold text-slate-800">فیلتر محصولات</h2>
           </div>
 
           <div id="product-filters">
@@ -445,9 +445,9 @@ export default function ProductsCatalog() {
                     >
                       <X size={18} />
                     </button>
-                    <h4 className="text-base font-extrabold text-slate-800">
+                    <h3 className="text-base font-extrabold text-slate-800">
                       {activeSheet.title}
-                    </h4>
+                    </h3>
                   </div>
 
                   {activeSheet.type === 'cats' ? (

@@ -13,7 +13,8 @@ export default function SectionHeading({ eyebrow, title, highlight, light = fals
         {eyebrow}
       </motion.p>
 
-      <motion.h3
+      {/* عنوان بخش‌ها h2 است: زیرِ h1 صفحه و بالای عنوان کارت‌ها (h3) */}
+      <motion.h2
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -24,7 +25,7 @@ export default function SectionHeading({ eyebrow, title, highlight, light = fals
       >
         {title}{' '}
         {highlight && <span className={light ? 'text-brand-200' : 'text-brand-600'}>{highlight}</span>}
-      </motion.h3>
+      </motion.h2>
 
       {/* خط زیر عنوان — وسط‌چین */}
       <motion.span

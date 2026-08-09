@@ -46,7 +46,7 @@ export default function ProcessSteps() {
                       {toFa(i + 1)}
                     </span>
                   </div>
-                  <h4 className="mt-5 text-base font-extrabold text-slate-800">{s.title}</h4>
+                  <h3 className="mt-5 text-base font-extrabold text-slate-800">{s.title}</h3>
                   <p className="mx-auto mt-2 max-w-[15rem] text-sm leading-7 text-slate-500">
                     {s.desc}
                   </p>

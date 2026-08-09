@@ -28,7 +28,7 @@ export default function AboutValues() {
                 <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-slate-800 to-brand-700 text-white shadow-lg transition duration-300 group-hover:scale-110">
                   <Icon size={28} />
                 </div>
-                <h4 className="mb-2 text-base font-extrabold text-slate-800">{v.title}</h4>
+                <h3 className="mb-2 text-base font-extrabold text-slate-800">{v.title}</h3>
                 <p className="text-sm leading-7 text-slate-600">{v.desc}</p>
               </motion.article>
             )

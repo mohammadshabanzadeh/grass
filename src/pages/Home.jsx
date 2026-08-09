@@ -7,8 +7,15 @@ import Stats from '../components/Stats.jsx'
 import Projects from '../components/Projects.jsx'
 import HomeAbout from '../components/HomeAbout.jsx'
 import CTA from '../components/CTA.jsx'
+import { useSeo, organizationSchema } from '../lib/seo.js'
 
 export default function Home() {
+  useSeo({
+    description:
+      'فراز چمن، مرجع تخصصی اجرای چمن مصنوعی در ایران؛ زمین فوتبال با استاندارد فیفا، روف گاردن، محوطه‌سازی و فضای بازی کودکان',
+    schema: organizationSchema(),
+  })
+
   useEffect(() => {
     if (window.location.hash) {
       const el = document.querySelector(window.location.hash)

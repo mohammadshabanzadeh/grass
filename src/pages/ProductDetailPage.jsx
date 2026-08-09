@@ -15,6 +15,7 @@ import SmartImage from '../components/SmartImage.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import CTA from '../components/CTA.jsx'
 import { fetchProductBySlug, fetchProducts } from '../lib/wp.js'
+import { useSeo, productSchema } from '../lib/seo.js'
 
 const faDigits = '۰۱۲۳۴۵۶۷۸۹'
 const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
@@ -25,6 +26,15 @@ export default function ProductDetailPage() {
   const [related, setRelated] = useState([])
   const [status, setStatus] = useState('loading') // loading | ready | notfound | error
   const [active, setActive] = useState(0)
+
+  // عنوان و متاهای صفحه از خودِ محصول ساخته می‌شوند
+  useSeo({
+    title: product?.title,
+    description: product?.desc,
+    image: product?.img,
+    type: 'product',
+    schema: productSchema(product),
+  })
 
   useEffect(() => {
     window.scrollTo(0, 0)

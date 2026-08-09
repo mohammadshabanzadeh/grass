@@ -23,7 +23,7 @@ export default function ContactLocation() {
         <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/30">
           <MapPin size={22} />
         </span>
-        <h3 className="text-lg font-extrabold text-slate-800 sm:text-xl">ما کجاییم؟</h3>
+        <h2 className="text-lg font-extrabold text-slate-800 sm:text-xl">ما کجاییم؟</h2>
       </div>
 
       <div className="text-right">

@@ -46,7 +46,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 gap-10 pb-12 lg:grid-cols-5">
           {/* ساعات کاری */}
           <div>
-            <h4 className="mb-5 text-base font-bold text-white">ساعات کاری</h4>
+            <p className="mb-5 text-base font-bold text-white">ساعات کاری</p>
             <ul className="space-y-4 text-sm">
               {workingHours.map((w) => (
                 <li key={w.day}>
@@ -64,7 +64,7 @@ export default function Footer() {
 
           {/* لینک‌های مفید */}
           <div>
-            <h4 className="mb-5 text-base font-bold text-white">لینک‌های مفید</h4>
+            <p className="mb-5 text-base font-bold text-white">لینک‌های مفید</p>
             <ul className="space-y-3 text-sm">
               {quickLinks.map((l) => (
                 <li key={l.label}>
@@ -82,7 +82,7 @@ export default function Footer() {
 
           {/* خدمات */}
           <div>
-            <h4 className="mb-5 text-base font-bold text-white">خدمات</h4>
+            <p className="mb-5 text-base font-bold text-white">خدمات</p>
             <ul className="space-y-3 text-sm">
               {services.map((s) => (
                 <li key={s} className="text-slate-400 transition hover:text-brand-300">
@@ -94,7 +94,7 @@ export default function Footer() {
 
           {/* اطلاعات تماس */}
           <div className="col-span-2 lg:col-span-1">
-            <h4 className="mb-5 text-base font-bold text-white">اطلاعات تماس</h4>
+            <p className="mb-5 text-base font-bold text-white">اطلاعات تماس</p>
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-2.5">
                 <MapPin size={18} className="mt-0.5 shrink-0 text-brand-400" />

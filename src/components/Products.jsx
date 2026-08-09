@@ -132,9 +132,9 @@ export default function Products() {
                       </div>
 
                       <div className="p-5 text-center">
-                        <h4 className="truncate text-base font-extrabold text-slate-800 sm:text-lg">
+                        <h3 className="truncate text-base font-extrabold text-slate-800 sm:text-lg">
                           {p.title}
-                        </h4>
+                        </h3>
                         <p className="mx-auto mt-2 line-clamp-2 min-h-[3.5rem] max-w-[15rem] text-xs leading-7 text-slate-600 sm:text-sm">
                           {p.desc}
                         </p>

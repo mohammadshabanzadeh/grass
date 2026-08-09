@@ -33,7 +33,7 @@ export default function ContactForm() {
         <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/30">
           <MessageSquare size={22} />
         </span>
-        <h3 className="text-lg font-extrabold text-slate-800 sm:text-xl">برای ما پیام بگذارید</h3>
+        <h2 className="text-lg font-extrabold text-slate-800 sm:text-xl">برای ما پیام بگذارید</h2>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">

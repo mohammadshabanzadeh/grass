@@ -32,11 +32,11 @@ export default function ServicePackages() {
                 </span>
               )}
 
-              <h4
+              <h3
                 className={`text-xl font-extrabold ${pkg.featured ? 'text-white' : 'text-slate-800'}`}
               >
                 پکیج {pkg.name}
-              </h4>
+              </h3>
               <p className={`mt-1.5 text-sm ${pkg.featured ? 'text-white/80' : 'text-slate-500'}`}>
                 {pkg.tagline}
               </p>

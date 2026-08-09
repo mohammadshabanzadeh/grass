@@ -1,0 +1,15 @@
+# فراز چمن
+#
+# در حال حاضر سایت از نمایه‌سازی موتورهای جست‌وجو خارج است، هم‌راستا با
+# تیک «عدم نمایه‌سازی» در وردپرس.
+#
+# ‼️ هنگام رونمایی سایت:
+#    ۱) سطر «Disallow: /» زیر را حذف کنید (یا به «Allow: /» تغییر دهید)
+#    ۲) تگ <meta name="robots" content="noindex, nofollow"> را هم از
+#       index.html بردارید
+#    ۳) سطر Sitemap را از حالت کامنت خارج کنید
+
+User-agent: *
+Disallow: /
+
+# Sitemap: https://farazchaman.ir/sitemap.xml

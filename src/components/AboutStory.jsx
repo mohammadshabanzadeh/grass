@@ -60,9 +60,9 @@ export default function AboutStory() {
           className="order-3 flex flex-col justify-center text-right lg:col-span-4"
         >
           <p className="mb-2 text-sm font-bold text-brand-600">داستان ما</p>
-          <h3 className="text-2xl font-extrabold leading-relaxed text-slate-800 sm:text-3xl">
+          <h2 className="text-2xl font-extrabold leading-relaxed text-slate-800 sm:text-3xl">
             از یک ایده تا تبدیل شدن به مرجع تخصصی چمن مصنوعی
-          </h3>
+          </h2>
           <p className="mt-5 text-sm leading-8 text-slate-600">
             فراز چمن فعالیت خود را با هدف ارائه‌ی بهترین راهکارهای فضای سبز مصنوعی
             آغاز کرد. ما باور داریم که هر فضایی، شایسته‌ی داشتن چمنی زیبا، باکیفیت

@@ -5,8 +5,15 @@ import ProcessSteps from '../components/ProcessSteps.jsx'
 import ServicePackages from '../components/ServicePackages.jsx'
 import FAQ from '../components/FAQ.jsx'
 import CTA from '../components/CTA.jsx'
+import { useSeo } from '../lib/seo.js'
 
 export default function ServicesPage() {
+  useSeo({
+    title: 'خدمات',
+    description:
+      'خدمات تخصصی چمن مصنوعی: فروش، طراحی، زیرسازی، نصب حرفه‌ای، نگهداری و ضمانت',
+  })
+
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])

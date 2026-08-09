@@ -60,7 +60,7 @@ const ProductCard = forwardRef(function ProductCard(
             <span className="glass flex h-10 w-10 items-center justify-center rounded-full text-brand-600">
               <Icon size={20} />
             </span>
-            <h4 className="text-lg font-extrabold text-slate-800">{p.title}</h4>
+            <h3 className="text-lg font-extrabold text-slate-800">{p.title}</h3>
           </div>
           <p className="text-sm leading-7 text-slate-600">{p.desc}</p>
           <Link
@@ -116,7 +116,7 @@ const ProductCard = forwardRef(function ProductCard(
       </div>
 
       <div className="px-5 pb-6 pt-10 text-center">
-        <h4 className="text-lg font-extrabold text-slate-800">{p.title}</h4>
+        <h3 className="text-lg font-extrabold text-slate-800">{p.title}</h3>
         <p className="mx-auto mt-2 max-w-[16rem] text-sm leading-7 text-slate-600">{p.desc}</p>
         <Link
           to={p.slug ? `/product/${p.slug}` : '/products'}

@@ -4,8 +4,15 @@ import Features from '../components/Features.jsx'
 import ProductsCatalog from '../components/ProductsCatalog.jsx'
 import CTA from '../components/CTA.jsx'
 import { productFeatures, serviceFeatures } from '../data.js'
+import { useSeo } from '../lib/seo.js'
 
 export default function ProductsPage() {
+  useSeo({
+    title: 'محصولات',
+    description:
+      'انواع چمن مصنوعی ورزشی، تزئینی، رنگی و فضای سبز با کیفیت بالا — فراز چمن',
+  })
+
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])

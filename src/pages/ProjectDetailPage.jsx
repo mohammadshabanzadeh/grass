@@ -7,6 +7,7 @@ import { Shimmer } from '../components/Skeleton.jsx'
 import CTA from '../components/CTA.jsx'
 import { fetchProjectById } from '../lib/wp.js'
 import { projectCategories, usageTypes } from '../data.js'
+import { useSeo } from '../lib/seo.js'
 
 const faDigits = '۰۱۲۳۴۵۶۷۸۹'
 const toFa = (n) => String(n).replace(/\d/g, (d) => faDigits[d])
@@ -18,6 +19,14 @@ export default function ProjectDetailPage() {
   const { id } = useParams()
   const [project, setProject] = useState(null)
   const [status, setStatus] = useState('loading') // loading | ready | notfound | error
+
+  // عنوان و متاهای صفحه از خودِ پروژه ساخته می‌شوند
+  useSeo({
+    title: project?.title,
+    description: project?.excerpt || project?.city,
+    image: project?.img,
+    type: 'article',
+  })
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -156,9 +165,9 @@ export default function ProjectDetailPage() {
 
             {project.gallery.length > 0 && (
               <div>
-                <h3 className="mb-4 text-right text-lg font-extrabold text-slate-800">
+                <h2 className="mb-4 text-right text-lg font-extrabold text-slate-800">
                   گالری تصاویر پروژه
-                </h3>
+                </h2>
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   {project.gallery.map((url, i) => (
                     <motion.div
@@ -188,9 +197,9 @@ export default function ProjectDetailPage() {
             transition={{ duration: 0.5 }}
             className="glass h-fit rounded-3xl p-6"
           >
-            <h3 className="mb-4 text-right text-lg font-extrabold text-slate-800">
+            <h2 className="mb-4 text-right text-lg font-extrabold text-slate-800">
               مشخصات پروژه
-            </h3>
+            </h2>
             <ul className="space-y-4">
               {specs.map((s) => (
                 <li

@@ -120,7 +120,7 @@ export default function ProjectsCatalog() {
               )}
             </span>
             <span className="flex items-center gap-2">
-              <h3 className="text-lg font-extrabold text-slate-800">فیلتر پروژه ها</h3>
+              <h2 className="text-lg font-extrabold text-slate-800">فیلتر پروژه ها</h2>
               <ChevronDown
                 size={18}
                 className={`text-slate-500 transition ${filtersOpen ? 'rotate-180' : ''}`}
@@ -133,7 +133,7 @@ export default function ProjectsCatalog() {
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/30">
               <SlidersHorizontal size={18} />
             </span>
-            <h3 className="text-lg font-extrabold text-slate-800">فیلتر پروژه ها</h3>
+            <h2 className="text-lg font-extrabold text-slate-800">فیلتر پروژه ها</h2>
           </div>
 
           <div id="project-filters" className={`${filtersOpen ? 'block' : 'hidden'} lg:block`}>
@@ -406,7 +406,7 @@ export default function ProjectsCatalog() {
 function FilterBlock({ title, children, last = false }) {
   return (
     <div className={`py-5 ${last ? '' : 'border-b border-white/50'}`}>
-      <h4 className="text-right text-sm font-extrabold text-slate-800">{title}</h4>
+      <h3 className="text-right text-sm font-extrabold text-slate-800">{title}</h3>
       {children}
     </div>
   )
