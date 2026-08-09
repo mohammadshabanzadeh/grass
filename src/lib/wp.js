@@ -1,7 +1,17 @@
-// ارتباط با وردپرس/ووکامرس از طریق پروکسی same-origin (/wpapi)
-// در توسعه توسط Vite و در پروداکشن توسط Vercel به api.farazchaman.ir پروکسی می‌شود.
-
-const WP = '/wpapi'
+/**
+ * آدرس پایه‌ی وردپرس.
+ *
+ * در توسعه از پروکسی Vite («/wpapi») استفاده می‌شود تا درگیر CORS نشویم.
+ * در نسخه‌ی نهایی مستقیم به دامنه‌ی وردپرس وصل می‌شویم؛ این کار باعث
+ * می‌شود بیلد روی «هر» هاستی کار کند (هاست اشتراکی، سی‌پنل، نginx و…) و
+ * به بازنویسی مسیر در سرور نیاز نداشته باشد. خودِ وردپرس هدرهای CORS را
+ * می‌فرستد و مبدأ درخواست را بازتاب می‌دهد، پس فراخوانی مستقیم مجاز است.
+ *
+ * در صورت نیاز می‌توان با متغیر محیطی VITE_WP_BASE آن را تغییر داد.
+ */
+const WP =
+  import.meta.env.VITE_WP_BASE ||
+  (import.meta.env.DEV ? '/wpapi' : 'https://api.farazchaman.ir/wp-json')
 
 function stripHtml(html = '') {
   return html
@@ -123,14 +133,16 @@ const PRODUCT_FIELDS =
 
 /** محصولات، دسته‌بندی‌ها و فهرست را از سه مسیر جدا می‌گیرد (حالت پشتیبان). */
 async function loadSeparately() {
+  // فقط از مسیرهایی استفاده می‌شود که هدر CORS می‌فرستند.
+  // Store API ووکامرس (wc/store/v1) این هدر را ندارد، پس وقتی سایت روی
+  // هاست خودش نشسته و مستقیم به وردپرس وصل می‌شود، مرورگر آن را بلاک
+  // می‌کند. مسیرهای faraz/v1 و wp/v2 هدر را می‌فرستند.
   // بدون تلاش مجدد: این مسیر فقط وقتی اجرا می‌شود که catalog از کار افتاده
   // باشد؛ تلاش دوباره روی سرورِ از قبل کند، اوضاع را بدتر می‌کند.
   const opts = { retries: 0 }
   const [prod, cats, menu] = await Promise.all([
-    apiFetch(`/wc/store/v1/products?per_page=100&_fields=${PRODUCT_FIELDS}`, opts).then((r) =>
-      r.json(),
-    ),
-    apiFetch(`/wc/store/v1/products/categories?per_page=100&_fields=id,name,slug,parent,count`, opts)
+    apiFetch('/faraz/v1/products', opts).then((r) => r.json()),
+    apiFetch('/faraz/v1/product-categories', opts)
       .then((r) => r.json())
       .catch(() => []),
     apiFetch('/faraz/v1/site-menu', opts)
@@ -195,6 +207,12 @@ export function fetchProducts() {
  */
 export function fetchProductAttributes() {
   return once('attributes', async () => {
+    // این تنها داده‌ای است که فقط از Store API ووکامرس می‌آید و آن مسیر
+    // هدر CORS نمی‌فرستد. وقتی سایت مستقیم (بدون پروکسی) به وردپرس وصل
+    // می‌شود مرورگر این درخواست را بلاک می‌کند و در نتیجه فیلترهای ویژگی و
+    // نسخه‌ی کوچک تصاویر غیرفعال می‌مانند — بقیه‌ی سایت دست‌نخورده کار
+    // می‌کند. برای فعال شدن، باید در وردپرس برای wc/store/v1 هدر CORS
+    // اضافه شود.
     // تصاویر را هم در همین درخواست می‌گیریم: مسیر catalog فقط آدرس تصویر
     // کامل (۸۰۰ پیکسل) را می‌دهد، ولی ووکامرس نسخه‌های ۳۰۰ و ۶۰۰ پیکسلی هم
     // دارد و کارت‌ها در ~۳۰۰ پیکسل نمایش داده می‌شوند. چون این درخواست

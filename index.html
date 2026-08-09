@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <!-- آیکون تب مرورگر: همان لوگوی سایت -->
     <link rel="icon" type="image/png" href="/logo.png" />
+    <!-- فقط DNS از قبل حل شود. preconnect عمداً حذف شده: سوکتِ از پیش
+         بازشده به این سرور در عمل باعث ERR_CONNECTION_TIMED_OUT روی اولین
+         درخواست‌های صفحه می‌شد. -->
+    <link rel="dns-prefetch" href="https://api.farazchaman.ir" />
     <link rel="apple-touch-icon" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="فراز چمن - فروش و نصب تخصصی چمن مصنوعی با بهترین کیفیت و خدمات پس از فروش در سراسر کشور" />
